@@ -10,8 +10,12 @@ import (
 
 func main() {
 	http.HandleFunc("/hello", api.Hello)
+	http.HandleFunc("/getPlayer", api.GetPlayer)
 	http.HandleFunc("/createPlayer", api.CreatePlayer)
+	http.HandleFunc("/updatePlayer", api.UpdatePlayer)
+	http.HandleFunc("/deletePlayer", api.DeletePlayer)
 	http.HandleFunc("/submitResults", api.SubmitResults)
+	http.HandleFunc("/getPlayers", api.GetPlayers)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {

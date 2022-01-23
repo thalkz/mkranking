@@ -1,6 +1,6 @@
 package api
 
-type player struct {
+type Player struct {
 	Id     string  `json:"id"`
 	Name   string  `json:"name"`
 	Rating float64 `json:"rating"`

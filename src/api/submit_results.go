@@ -12,7 +12,7 @@ type submitResultsRequest struct {
 }
 
 type submitResultsResponse struct {
-	Players []player `json:"players"`
+	Players []Player `json:"players"`
 }
 
 func SubmitResults(w http.ResponseWriter, req *http.Request) {
@@ -30,7 +30,7 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Printf("Submitting results %v...\n", body.Results)
 	submitResultsResponse := submitResultsResponse{
-		Players: []player{
+		Players: []Player{
 			{
 				Id:     "one",
 				Name:   "One",

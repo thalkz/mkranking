@@ -7,26 +7,22 @@ import (
 	"net/http"
 )
 
-type createPlayerRequest struct {
-	Name string `json:"name"`
-}
-
-type createPlayerResponse struct {
+type deletePlayerRequest struct {
 	Id string `json:"id"`
 }
 
-func CreatePlayer(w http.ResponseWriter, req *http.Request) {
+func DeletePlayer(w http.ResponseWriter, req *http.Request) {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
-	var body createPlayerRequest
+	var body deletePlayerRequest
 	jsonErr := json.Unmarshal(b, &body)
 	if jsonErr != nil {
 		handleError(w, jsonErr)
 		return
 	}
-	fmt.Printf("Creating %v...\n", body.Name)
-	// TODO Create player
+	fmt.Fprintf(w, "Deleting %v...\n", body.Id)
+	// TODO Delete player
 }

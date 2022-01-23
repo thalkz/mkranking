@@ -7,15 +7,12 @@ import (
 	"net/http"
 )
 
-type createPlayerRequest struct {
+type updatePlayerRequest struct {
+	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-type createPlayerResponse struct {
-	Id string `json:"id"`
-}
-
-func CreatePlayer(w http.ResponseWriter, req *http.Request) {
+func UpdatePlayer(w http.ResponseWriter, req *http.Request) {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)
@@ -27,6 +24,6 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) {
 		handleError(w, jsonErr)
 		return
 	}
-	fmt.Printf("Creating %v...\n", body.Name)
+	fmt.Printf("Updating %v...\n", body.Name)
 	// TODO Create player
 }
