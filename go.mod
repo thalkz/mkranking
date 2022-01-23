@@ -1,3 +1,3 @@
-module github.com/thalkz/thalkz_com
+module github.com/thalkz/kart
 
 go 1.17
