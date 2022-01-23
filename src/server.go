@@ -1,12 +1,17 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/thalkz/kart/src/api"
+	"github.com/thalkz/kart/src/database"
 )
+
+var Database *sql.DB
 
 func main() {
 	http.HandleFunc("/hello", api.Hello)
@@ -22,9 +27,15 @@ func main() {
 		httpPort = "8080"
 	}
 
-	fmt.Println("Listening on port", httpPort)
-	err := http.ListenAndServe(":"+httpPort, nil)
+	err := database.Open()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
+	}
+	defer database.Close()
+
+	fmt.Println("Listening on port", httpPort)
+	err = http.ListenAndServe(":"+httpPort, nil)
+	if err != nil {
+		panic(err)
 	}
 }

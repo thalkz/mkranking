@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/thalkz/kart/src/database"
 )
 
 type createPlayerRequest struct {
@@ -28,5 +30,12 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	fmt.Printf("Creating %v...\n", body.Name)
-	// TODO Create player
+
+	insertStmt := `insert into "Players"("name", "rating") values('John', 1000.0)`
+	result, dbErr := database.Exec(insertStmt)
+	if dbErr != nil {
+		handleError(w, dbErr)
+	}
+
+	fmt.Printf("Database response: %v", result)
 }
