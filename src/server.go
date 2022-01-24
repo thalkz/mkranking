@@ -20,7 +20,8 @@ func main() {
 	http.HandleFunc("/updatePlayer", api.UpdatePlayer)
 	http.HandleFunc("/deletePlayer", api.DeletePlayer)
 	http.HandleFunc("/submitResults", api.SubmitResults)
-	http.HandleFunc("/getPlayers", api.GetPlayers)
+	http.HandleFunc("/getAllPlayers", api.GetAllPlayers)
+	http.HandleFunc("/ResetAllRatings", api.ResetAllRatings)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {

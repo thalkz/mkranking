@@ -8,8 +8,8 @@ import (
 	"github.com/thalkz/kart/src/database"
 )
 
-func GetPlayers(w http.ResponseWriter, req *http.Request) {
-	players, err := database.GetPlayers()
+func GetAllPlayers(w http.ResponseWriter, req *http.Request) {
+	players, err := database.GetAllPlayers()
 	if err != nil {
 		handleError(w, err)
 		return

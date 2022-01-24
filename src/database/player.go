@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/thalkz/kart/src/models"
 )
@@ -40,7 +41,24 @@ func GetPlayer(id int) (models.Player, error) {
 	return player, err
 }
 
-func GetPlayers() ([]models.Player, error) {
+func GetPlayers(playerIds []int) ([]models.Player, error) {
+	arrayStatement := strings.Trim(strings.Join(strings.Split(fmt.Sprint(playerIds), " "), ", "), "[]")
+	statement := fmt.Sprintf(`SELECT * FROM "Players" WHERE id IN (%v)`, arrayStatement)
+	fmt.Println(statement)
+	rows, err := db.Query(statement)
+	players := make([]models.Player, 0)
+	for next := rows.Next(); next; next = rows.Next() {
+		var player models.Player
+		err = rows.Scan(&player.Id, &player.Name, &player.Rating)
+		if err != nil {
+			return nil, err
+		}
+		players = append(players, player)
+	}
+	return players, err
+}
+
+func GetAllPlayers() ([]models.Player, error) {
 	statement := fmt.Sprintf(`SELECT * FROM "Players"`)
 	rows, err := db.Query(statement)
 	players := make([]models.Player, 0)

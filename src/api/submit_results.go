@@ -6,15 +6,12 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/thalkz/kart/src/models"
+	"github.com/thalkz/kart/src/database"
+	"github.com/thalkz/kart/src/elo"
 )
 
 type submitResultsRequest struct {
-	Results []string `json:"results"`
-}
-
-type submitResultsResponse struct {
-	Players []models.Player `json:"players"`
+	Ranking []int `json:"ranking"`
 }
 
 func SubmitResults(w http.ResponseWriter, req *http.Request) {
@@ -30,26 +27,28 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Printf("Submitting results %v...\n", body.Results)
-	submitResultsResponse := submitResultsResponse{
-		Players: []models.Player{
-			{
-				Id:     "one",
-				Name:   "One",
-				Rating: 1000.0,
-			},
-			{
-				Id:     "two",
-				Name:   "Two",
-				Rating: 1002.0,
-			},
-		},
-	}
+	fmt.Printf("Submitting results %v\n", body.Ranking)
 
-	responseBytes, resErr := json.Marshal(&submitResultsResponse)
-	if resErr != nil {
-		handleError(w, resErr)
+	players, err := database.GetPlayers(body.Ranking)
+	if err != nil {
+		handleError(w, err)
 		return
 	}
-	fmt.Fprint(w, string(responseBytes))
+
+	ratings := make([]float64, len(players))
+	for i := range players {
+		ratings[i] = players[i].Rating
+	}
+
+	newRatings := elo.ComputeRatings(ratings)
+
+	// TODO Update all ratings in the same transaction
+	for i := range body.Ranking {
+		err := database.UpdatePlayerRating(body.Ranking[i], newRatings[i])
+		if err != nil {
+			handleError(w, err)
+			return
+		}
+	}
+	fmt.Fprint(w, "ok")
 }

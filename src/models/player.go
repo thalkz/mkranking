@@ -1,7 +1,7 @@
 package models
 
 type Player struct {
-	Id     string  `json:"id"`
+	Id     int     `json:"id"`
 	Name   string  `json:"name"`
 	Rating float64 `json:"rating"`
 }

@@ -8,11 +8,11 @@ var D float64 = 400.0
 var K float64 = 32.0
 
 /// Compute updated ratings for all players
-func ComputeRatings(ratings []float64, positions []int) []float64 {
+func ComputeRatings(ratings []float64) []float64 {
 	updatedRatings := make([]float64, len(ratings))
 	for i := range ratings {
 		expected := computeExpectedScore(i, ratings)
-		actual := computeActualScore(positions[i], len(ratings))
+		actual := computeActualScore(i+1, len(ratings))
 		updatedRating := computeUpdatedRating(ratings[i], expected, actual, len(ratings))
 		updatedRatings[i] = updatedRating
 	}
