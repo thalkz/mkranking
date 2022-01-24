@@ -5,24 +5,28 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/thalkz/kart/src/database"
 )
 
 type deletePlayerRequest struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 }
 
 func DeletePlayer(w http.ResponseWriter, req *http.Request) {
-	b, err := io.ReadAll(req.Body)
-	if err != nil {
+	if b, err := io.ReadAll(req.Body); err != nil {
 		handleError(w, err)
 		return
+	} else {
+		var body deletePlayerRequest
+		if err := json.Unmarshal(b, &body); err != nil {
+			handleError(w, err)
+			return
+		}
+		if err := database.DeletePlayer(body.Id); err != nil {
+			handleError(w, err)
+			return
+		}
+		fmt.Fprintf(w, "ok")
 	}
-	var body deletePlayerRequest
-	jsonErr := json.Unmarshal(b, &body)
-	if jsonErr != nil {
-		handleError(w, jsonErr)
-		return
-	}
-	fmt.Fprintf(w, "Deleting %v...\n", body.Id)
-	// TODO Delete player
 }

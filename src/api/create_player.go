@@ -14,8 +14,13 @@ type createPlayerRequest struct {
 }
 
 type createPlayerResponse struct {
-	Id string `json:"id"`
+	Status string `json:"status"`
+	Id     int    `json:"id"`
 }
+
+const (
+	initialRating = 1000.0
+)
 
 func CreatePlayer(w http.ResponseWriter, req *http.Request) {
 	b, err := io.ReadAll(req.Body)
@@ -31,11 +36,15 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Printf("Creating %v...\n", body.Name)
 
-	insertStmt := `insert into "Players"("name", "rating") values('John', 1000.0)`
-	result, dbErr := database.Exec(insertStmt)
+	id, dbErr := database.CreatePlayer(body.Name, initialRating)
 	if dbErr != nil {
 		handleError(w, dbErr)
+		return
 	}
-
-	fmt.Printf("Database response: %v", result)
+	responseBody := createPlayerResponse{
+		Status: "ok",
+		Id:     id,
+	}
+	responseJson, _ := json.Marshal(responseBody)
+	fmt.Fprintf(w, "%v", string(responseJson))
 }

@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/thalkz/kart/src/database"
 )
 
 type updatePlayerRequest struct {
-	Id   string `json:"id"`
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -18,12 +20,18 @@ func UpdatePlayer(w http.ResponseWriter, req *http.Request) {
 		handleError(w, err)
 		return
 	}
-	var body createPlayerRequest
+	var body updatePlayerRequest
 	jsonErr := json.Unmarshal(b, &body)
 	if jsonErr != nil {
 		handleError(w, jsonErr)
 		return
 	}
 	fmt.Printf("Updating %v...\n", body.Name)
-	// TODO Create player
+
+	err = database.UpdatePlayerName(body.Id, body.Name)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	fmt.Fprintf(w, "ok")
 }

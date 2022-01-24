@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/thalkz/kart/src/models"
 )
 
 type submitResultsRequest struct {
@@ -12,7 +14,7 @@ type submitResultsRequest struct {
 }
 
 type submitResultsResponse struct {
-	Players []Player `json:"players"`
+	Players []models.Player `json:"players"`
 }
 
 func SubmitResults(w http.ResponseWriter, req *http.Request) {
@@ -30,7 +32,7 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Printf("Submitting results %v...\n", body.Results)
 	submitResultsResponse := submitResultsResponse{
-		Players: []Player{
+		Players: []models.Player{
 			{
 				Id:     "one",
 				Name:   "One",

@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/thalkz/kart/src/database"
+	"github.com/thalkz/kart/src/models"
 )
 
 type getPlayerRequest struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 }
 
 func GetPlayer(w http.ResponseWriter, req *http.Request) {
@@ -17,12 +20,27 @@ func GetPlayer(w http.ResponseWriter, req *http.Request) {
 		handleError(w, err)
 		return
 	}
+
 	var body getPlayerRequest
-	jsonErr := json.Unmarshal(b, &body)
-	if jsonErr != nil {
-		handleError(w, jsonErr)
+	err = json.Unmarshal(b, &body)
+	if err != nil {
+		handleError(w, err)
 		return
 	}
-	fmt.Printf("Getting \"%v\"...\n", body.Id)
-	// TODO Create player
+
+	var player models.Player
+	player, err = database.GetPlayer(body.Id)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	var bytes []byte
+	bytes, err = json.Marshal(player)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	fmt.Fprintf(w, string(bytes))
 }
