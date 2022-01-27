@@ -14,24 +14,23 @@ type updatePlayerRequest struct {
 	Name string `json:"name"`
 }
 
-func UpdatePlayer(w http.ResponseWriter, req *http.Request) {
+func UpdatePlayer(w http.ResponseWriter, req *http.Request) error {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
+
 	var body updatePlayerRequest
-	jsonErr := json.Unmarshal(b, &body)
-	if jsonErr != nil {
-		handleError(w, jsonErr)
-		return
+	if err := json.Unmarshal(b, &body); err != nil {
+		return err
 	}
-	fmt.Printf("Updating %v...\n", body.Name)
+	fmt.Printf("Updating %v\n", body.Name)
 
 	err = database.UpdatePlayerName(body.Id, body.Name)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
-	fmt.Fprintf(w, "ok")
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+	})
 }

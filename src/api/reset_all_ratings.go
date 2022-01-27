@@ -1,28 +1,29 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/thalkz/kart/src/database"
 )
 
-func ResetAllRatings(w http.ResponseWriter, req *http.Request) {
+func ResetAllRatings(w http.ResponseWriter, req *http.Request) error {
 	fmt.Printf("Reseting all ratings...")
 
 	players, err := database.GetAllPlayers()
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
 
 	// TODO Update all ratings in the same transaction
 	for i := range players {
 		err := database.UpdatePlayerRating(players[i].Id, 1000.0)
 		if err != nil {
-			handleError(w, err)
-			return
+			return err
 		}
 	}
-	fmt.Fprint(w, "ok")
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+	})
 }

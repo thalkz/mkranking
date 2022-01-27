@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -14,33 +13,24 @@ type getPlayerRequest struct {
 	Id int `json:"id"`
 }
 
-func GetPlayer(w http.ResponseWriter, req *http.Request) {
+func GetPlayer(w http.ResponseWriter, req *http.Request) error {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
 
 	var body getPlayerRequest
-	err = json.Unmarshal(b, &body)
-	if err != nil {
-		handleError(w, err)
-		return
+	if err = json.Unmarshal(b, &body); err != nil {
+		return err
 	}
 
 	var player models.Player
 	player, err = database.GetPlayer(body.Id)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
-
-	var bytes []byte
-	bytes, err = json.Marshal(player)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-
-	fmt.Fprintf(w, string(bytes))
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+		Data:   player,
+	})
 }

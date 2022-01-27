@@ -2,22 +2,18 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/thalkz/kart/src/database"
 )
 
-func GetAllPlayers(w http.ResponseWriter, req *http.Request) {
+func GetAllPlayers(w http.ResponseWriter, req *http.Request) error {
 	players, err := database.GetAllPlayers()
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
-	bytes, err := json.Marshal(players)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-	fmt.Fprintf(w, "%v", string(bytes))
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+		Data:   players,
+	})
 }

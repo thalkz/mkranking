@@ -14,25 +14,25 @@ type submitResultsRequest struct {
 	Ranking []int `json:"ranking"`
 }
 
-func SubmitResults(w http.ResponseWriter, req *http.Request) {
+func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
-		return
-	}
-	var body submitResultsRequest
-	jsonErr := json.Unmarshal(b, &body)
-	if jsonErr != nil {
-		handleError(w, jsonErr)
-		return
+		return err
 	}
 
+	var body submitResultsRequest
+	if err := json.Unmarshal(b, &body); err != nil {
+		return err
+	}
 	fmt.Printf("Submitting results %v\n", body.Ranking)
+
+	if err := database.CreateRace(body.Ranking); err != nil {
+		return err
+	}
 
 	players, err := database.GetPlayers(body.Ranking)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
 
 	ratings := make([]float64, len(players))
@@ -44,11 +44,11 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) {
 
 	// TODO Update all ratings in the same transaction
 	for i := range body.Ranking {
-		err := database.UpdatePlayerRating(body.Ranking[i], newRatings[i])
-		if err != nil {
-			handleError(w, err)
-			return
+		if err := database.UpdatePlayerRating(body.Ranking[i], newRatings[i]); err != nil {
+			return err
 		}
 	}
-	fmt.Fprint(w, "ok")
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+	})
 }

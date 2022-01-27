@@ -14,37 +14,35 @@ type createPlayerRequest struct {
 }
 
 type createPlayerResponse struct {
-	Status string `json:"status"`
-	Id     int    `json:"id"`
+	Id int `json:"id"`
 }
 
 const (
 	initialRating = 1000.0
 )
 
-func CreatePlayer(w http.ResponseWriter, req *http.Request) {
+func CreatePlayer(w http.ResponseWriter, req *http.Request) error {
 	b, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
-		return
+		return err
 	}
 	var body createPlayerRequest
-	jsonErr := json.Unmarshal(b, &body)
-	if jsonErr != nil {
-		handleError(w, jsonErr)
-		return
+	err = json.Unmarshal(b, &body)
+	if err != nil {
+		return err
 	}
-	fmt.Printf("Creating %v...\n", body.Name)
+	fmt.Printf("Creating %v\n", body.Name)
 
-	id, dbErr := database.CreatePlayer(body.Name, initialRating)
-	if dbErr != nil {
-		handleError(w, dbErr)
-		return
+	id, err := database.CreatePlayer(body.Name, initialRating)
+	if err != nil {
+		return err
 	}
-	responseBody := createPlayerResponse{
-		Status: "ok",
-		Id:     id,
-	}
-	responseJson, _ := json.Marshal(responseBody)
-	fmt.Fprintf(w, "%v", string(responseJson))
+	return json.NewEncoder(w).Encode(
+		&JsonResponse{
+			Status: "ok",
+			Data: &createPlayerResponse{
+				Id: id,
+			},
+		},
+	)
 }

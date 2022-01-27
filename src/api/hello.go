@@ -1,10 +1,13 @@
 package api
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
-func Hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
+func Hello(w http.ResponseWriter, req *http.Request) error {
+	return json.NewEncoder(w).Encode(&JsonResponse{
+		Status: "ok",
+		Data:   "hello",
+	})
 }
