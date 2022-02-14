@@ -24,12 +24,13 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 	if err := json.Unmarshal(b, &body); err != nil {
 		return err
 	}
-	fmt.Printf("Submitting results %v\n", body.Ranking)
 
+	fmt.Printf("Creating race with ranking %v...\n", body.Ranking)
 	if err := database.CreateRace(body.Ranking); err != nil {
 		return err
 	}
 
+	fmt.Println("Getting players...")
 	players, err := database.GetPlayers(body.Ranking)
 	if err != nil {
 		return err
@@ -40,14 +41,14 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 		ratings[i] = players[i].Rating
 	}
 
+	fmt.Println("Computing elo...")
 	newRatings := elo.ComputeRatings(ratings)
 
-	// TODO Update all ratings in the same transaction
-	for i := range body.Ranking {
-		if err := database.UpdatePlayerRating(body.Ranking[i], newRatings[i]); err != nil {
-			return err
-		}
+	fmt.Printf("Updating ratings %v...\n", newRatings)
+	if err := database.UpdatePlayerRatings(body.Ranking, newRatings); err != nil {
+		return err
 	}
+
 	return json.NewEncoder(w).Encode(&JsonResponse{
 		Status: "ok",
 	})

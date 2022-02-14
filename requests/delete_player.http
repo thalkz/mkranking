@@ -2,5 +2,5 @@ POST http://localhost:8080/deletePlayer HTTP/1.1
 content-type: application/json
 
 {
-    "id": 15
+    "id": 17
 }

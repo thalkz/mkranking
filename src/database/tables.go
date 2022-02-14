@@ -25,8 +25,8 @@ func CreatePlayersRacesTable() error {
 	statement := `
 	CREATE TABLE IF NOT EXISTS players_races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-		user_id integer NOT NULL REFERENCES players(id),
-		race_id integer NOT NULL REFERENCES races(id)
+		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE
 	);`
 	_, err := db.Exec(statement)
 	return err

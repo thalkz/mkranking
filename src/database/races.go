@@ -1,35 +1,36 @@
 package database
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/lib/pq"
 	"github.com/thalkz/kart/src/models"
 )
 
 func CreateRace(ranking []int) error {
-	rankingArray := strings.Trim(strings.Join(strings.Split(fmt.Sprint(ranking), " "), ", "), "[]")
-	statement := fmt.Sprintf(`INSERT INTO races (ranking) values (ARRAY[%v]) RETURNING id;`, rankingArray)
-	fmt.Println(statement)
-	row := db.QueryRow(statement)
-	var raceId int
-	err := row.Scan(&raceId)
+	tx, err := db.Begin()
+	defer tx.Rollback()
 	if err != nil {
 		return err
 	}
+	row := tx.QueryRow("INSERT INTO races (ranking) values ($1) RETURNING id", pq.Array(ranking))
+	var raceId int
+
+	if err = row.Scan(&raceId); err != nil {
+		return err
+	}
 	for _, userId := range ranking {
-		linkStatement := fmt.Sprintf(`INSERT INTO players_races (user_id, race_id) values (%v, %v) RETURNING id;`, userId, raceId)
-		_, linkErr := db.Exec(linkStatement)
-		if linkErr != nil {
-			return linkErr
+		_, err := tx.Exec("INSERT INTO players_races (user_id, race_id) values ($1, $2) RETURNING id", userId, raceId)
+		if err != nil {
+			return err
 		}
+	}
+	if err = tx.Commit(); err != nil {
+		return err
 	}
 	return err
 }
 
 func GetRace(id int) (models.Race, error) {
-	statement := fmt.Sprintf(`SELECT * FROM races where id = %v`, id)
-	row := db.QueryRow(statement)
+	row := db.QueryRow("SELECT * FROM races where id = $1", id)
 	var race models.Race
 	err := row.Scan(&race.Id, &race.Ranking)
 	return race, err
