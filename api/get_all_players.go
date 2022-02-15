@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/thalkz/kart/src/database"
+	"github.com/thalkz/kart/database"
 )
 
 func GetAllPlayers(w http.ResponseWriter, req *http.Request) error {

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/thalkz/kart/src/api"
-	"github.com/thalkz/kart/src/database"
+	"github.com/thalkz/kart/api"
+	"github.com/thalkz/kart/database"
 )
 
 type appHandler func(http.ResponseWriter, *http.Request) error

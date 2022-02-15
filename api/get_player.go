@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/thalkz/kart/src/database"
-	"github.com/thalkz/kart/src/models"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/models"
 )
 
 type getPlayerRequest struct {

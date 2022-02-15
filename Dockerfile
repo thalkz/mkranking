@@ -1,15 +1,14 @@
-FROM golang:1.17-alpine as build
+FROM golang:1.17-alpine 
 
 WORKDIR app/
 
 COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 
-COPY src/ ./
-RUN GOOS=linux GOARCH=amd64 go build -o /server
+COPY . ./
 
-FROM scratch
-WORKDIR /
-COPY --from=build /server /server
+RUN go build -o /server
+
 EXPOSE 8080
 CMD ["/server"]

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lib/pq"
-	"github.com/thalkz/kart/src/models"
+	"github.com/thalkz/kart/models"
 )
 
 func CreatePlayer(name string, rating float64) (int, error) {

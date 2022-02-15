@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/thalkz/kart/src/database"
-	"github.com/thalkz/kart/src/elo"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/elo"
 )
 
 type submitResultsRequest struct {

@@ -2,7 +2,7 @@ package database
 
 import (
 	"github.com/lib/pq"
-	"github.com/thalkz/kart/src/models"
+	"github.com/thalkz/kart/models"
 )
 
 func CreateRace(ranking []int) error {
