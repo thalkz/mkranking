@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -15,16 +16,22 @@ import (
 type appHandler func(http.ResponseWriter, *http.Request) error
 
 func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	now := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println(now, r.RemoteAddr, r.Method, r.URL)
-	if err := fn(w, r); err != nil {
+	err := fn(w, r)
+	logRequest(r)
+	if err != nil {
 		bytes, _ := json.Marshal(&api.JsonResponse{
 			Status: "error",
 			Error:  err.Error(),
 		})
-		fmt.Println("Error:", r.URL, err)
+		fmt.Println("Error: ", r.URL, err)
 		http.Error(w, string(bytes), 500)
 	}
+}
+
+func logRequest(r *http.Request) {
+	now := time.Now().Format("2006-01-02 15:04:05")
+	ipAddr := strings.Split(r.RemoteAddr, ":")[0]
+	fmt.Printf("[%v] %v %v %v\n", now, ipAddr, r.Method, r.URL)
 }
 
 func main() {

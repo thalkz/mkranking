@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  db:
+  database:
     image: postgres
     restart: always
     environment:
@@ -13,11 +13,12 @@ services:
       - data:/var/lib/postgresql/data
 
   server:
+    image: thalkz/kart:latest
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_HOST: localhost
+      DATABASE_HOST: database
       DATABASE_PORT: 5432
       DATABASE_USER: postgres
       DATABASE_PASSWORD: password
