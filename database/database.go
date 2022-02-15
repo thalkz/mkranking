@@ -3,21 +3,22 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
 )
 
-const (
-	host     = "host.docker.internal"
-	port     = 5432
-	user     = "postgres"
-	password = "password"
-	dbname   = "postgres"
+var (
+	host     = os.Getenv("DATABASE_HOST")
+	port     = os.Getenv("DATABASE_PORT")
+	user     = os.Getenv("DATABASE_USER")
+	password = os.Getenv("DATABASE_PASSWORD")
+	dbname   = os.Getenv("DATABASE_NAME")
 )
 
 var db *sql.DB
 
 func Open() error {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	fmt.Printf("Opening database host=%s port=%d dbname=%s...\n", host, port, dbname)
+	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	fmt.Printf("Opening database host=%s port=%s dbname=%s...\n", host, port, dbname)
 	var err error
 	db, err = sql.Open("postgres", psqlconn)
 	if err != nil {

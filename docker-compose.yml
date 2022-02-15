@@ -16,6 +16,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: postgres
     depends_on:
       - database
     networks:
