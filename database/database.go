@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	host     = "localhost"
+	host     = "host.docker.internal"
 	port     = 5432
 	user     = "postgres"
 	password = "password"
-	dbname   = "kart_test"
+	dbname   = "postgres"
 )
 
 var db *sql.DB
