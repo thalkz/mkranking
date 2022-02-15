@@ -25,13 +25,13 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 
-	fmt.Printf("Creating race with ranking %v...\n", body.Ranking)
+	fmt.Printf("Creating race with ranking: %v\n", body.Ranking)
 	if err := database.CreateRace(body.Ranking); err != nil {
 		return err
 	}
 
-	fmt.Println("Getting players...")
 	players, err := database.GetPlayers(body.Ranking)
+	fmt.Printf("Getting players: %v\n", players)
 	if err != nil {
 		return err
 	}
@@ -41,10 +41,10 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 		ratings[i] = players[i].Rating
 	}
 
-	fmt.Println("Computing elo...")
+	fmt.Printf("Computing elo with ratings: %v\n", ratings)
 	newRatings := elo.ComputeRatings(ratings)
 
-	fmt.Printf("Updating ratings %v...\n", newRatings)
+	fmt.Printf("New ratings are %v\n", newRatings)
 	if err := database.UpdatePlayerRatings(body.Ranking, newRatings); err != nil {
 		return err
 	}

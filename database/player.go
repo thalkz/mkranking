@@ -71,7 +71,18 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 		}
 		players = append(players, player)
 	}
-	return players, err
+
+	// Order players based on input `playerIds` parameter
+	orderedPlayers := make([]models.Player, len(players))
+	for i, playerId := range playerIds {
+		for _, player := range players {
+			if player.Id == playerId {
+				orderedPlayers[i] = player
+				continue
+			}
+		}
+	}
+	return orderedPlayers, err
 }
 
 func GetAllPlayers() ([]models.Player, error) {
