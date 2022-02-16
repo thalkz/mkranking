@@ -25,6 +25,10 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 
+	if len(body.Ranking) < 2 {
+		return fmt.Errorf("Cannot submit results with less than two players. Recieved %v", body.Ranking)
+	}
+
 	fmt.Printf("Creating race with ranking: %v\n", body.Ranking)
 	if err := database.CreateRace(body.Ranking); err != nil {
 		return err
