@@ -42,6 +42,7 @@ func main() {
 	http.Handle("/deletePlayer", appHandler(api.DeletePlayer))
 	http.Handle("/submitResults", appHandler(api.SubmitResults))
 	http.Handle("/getAllPlayers", appHandler(api.GetAllPlayers))
+	http.Handle("/getAllRaces", appHandler(api.GetAllRaces))
 	http.Handle("/resetAllRatings", appHandler(api.ResetAllRatings))
 
 	httpPort := os.Getenv("HTTP_PORT")

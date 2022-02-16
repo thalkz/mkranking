@@ -1,6 +1,8 @@
 package database
 
 import (
+	"time"
+
 	"github.com/lib/pq"
 	"github.com/thalkz/kart/models"
 )
@@ -11,7 +13,8 @@ func CreateRace(ranking []int) error {
 	if err != nil {
 		return err
 	}
-	row := tx.QueryRow("INSERT INTO races (ranking) values ($1) RETURNING id", pq.Array(ranking))
+	now := time.Now().Format("2006-01-02 15:04:05")
+	row := tx.QueryRow("INSERT INTO races (ranking, date) values ($1, $2) RETURNING id", pq.Array(ranking), now)
 	var raceId int
 
 	if err = row.Scan(&raceId); err != nil {
@@ -32,6 +35,28 @@ func CreateRace(ranking []int) error {
 func GetRace(id int) (models.Race, error) {
 	row := db.QueryRow("SELECT * FROM races where id = $1", id)
 	var race models.Race
-	err := row.Scan(&race.Id, &race.Ranking)
+	var ranking pq.Int64Array
+	err := row.Scan(&race.Id, &ranking, &race.Date)
+	for i := range ranking {
+		race.Results = append(race.Results, (int)(ranking[i]))
+	}
 	return race, err
+}
+
+func GetAllRaces() ([]models.Race, error) {
+	rows, err := db.Query("SELECT * FROM races")
+	races := make([]models.Race, 0)
+	var ranking pq.Int64Array
+	for rows.Next() {
+		var race models.Race
+		err = rows.Scan(&race.Id, &ranking, &race.Date)
+		if err != nil {
+			return nil, err
+		}
+		for i := range ranking {
+			race.Results = append(race.Results, (int)(ranking[i]))
+		}
+		races = append(races, race)
+	}
+	return races, err
 }

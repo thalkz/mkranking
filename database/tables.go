@@ -4,8 +4,9 @@ func CreatePlayersTable() error {
 	statement := `
 	CREATE TABLE IF NOT EXISTS players (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-		name text,
-		rating double precision
+		name text NOT NULL,
+		rating double precision NOT NULL,
+		icon integer NOT NULL
 	);`
 	_, err := db.Exec(statement)
 	return err
@@ -15,7 +16,8 @@ func CreateRacesTable() error {
 	statement := `
 	CREATE TABLE IF NOT EXISTS races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-		ranking integer[]
+		ranking integer[] NOT NULL,
+		date timestamp without time zone NOT NULL
 	);`
 	_, err := db.Exec(statement)
 	return err
@@ -25,8 +27,8 @@ func CreatePlayersRacesTable() error {
 	statement := `
 	CREATE TABLE IF NOT EXISTS players_races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE,
-		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE
+		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE ON UPDATE CASCADE,
+		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE ON UPDATE CASCADE
 	);`
 	_, err := db.Exec(statement)
 	return err

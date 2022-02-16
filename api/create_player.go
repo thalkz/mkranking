@@ -11,6 +11,7 @@ import (
 
 type createPlayerRequest struct {
 	Name string `json:"name"`
+	Icon int    `json:"icon"`
 }
 
 type createPlayerResponse struct {
@@ -33,7 +34,7 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) error {
 	}
 	fmt.Printf("Creating %v\n", body.Name)
 
-	id, err := database.CreatePlayer(body.Name, initialRating)
+	id, err := database.CreatePlayer(body.Name, initialRating, body.Icon)
 	if err != nil {
 		return err
 	}
