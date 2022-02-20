@@ -1,3 +1,6 @@
 {
-    "workbench.colorTheme": "Celestial"
+    "workbench.colorTheme": "Celestial",
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": "file:///Users/roland/Code/kart/.github/workflows/deploy.yml"
+    }
 }

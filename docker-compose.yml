@@ -12,24 +12,24 @@ services:
       - data:/var/lib/postgresql/data
 
   server:
-    image: thalkz/kart:latest
+    image: thalkz/kart-server:latest
     build:
       context: ./server
-      dockerfile: Dockerfile
     env_file:
       - .env
     depends_on:
       - database
+    platform: "${PLATFORM_ARCH}"
     ports:
       - "443:443"
 
   web:
-    image: thalkz/kart-app:latest
+    image: thalkz/kart-web:latest
     build:
       context: ./app
-      dockerfile: Dockerfile
     env_file:
       .env
+    platform: "${PLATFORM_ARCH}"
     ports:
       - "8080:80"
   
@@ -37,9 +37,9 @@ services:
     image: thalkz/kart-reverse-proxy:latest
     build:
       context: ./reverse_proxy
-      dockerfile: Dockerfile
     depends_on:
       - server
+    platform: "${PLATFORM_ARCH}"
     ports:
       - "80:80"
 
