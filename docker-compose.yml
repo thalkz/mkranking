@@ -4,9 +4,8 @@ services:
   database:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -15,20 +14,34 @@ services:
   server:
     image: thalkz/kart:latest
     build:
-      context: .
+      context: ./server
       dockerfile: Dockerfile
-    environment:
-      DATABASE_HOST: database
-      DATABASE_PORT: 5432
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: password
-      DATABASE_NAME: postgres
+    env_file:
+      - .env
     depends_on:
       - database
-    networks:
-      - default
     ports:
-      - "8080:8080"
+      - "443:443"
+
+  web:
+    image: thalkz/kart-app:latest
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    env_file:
+      .env
+    ports:
+      - "8080:80"
+  
+  reverse-proxy:
+    image: thalkz/kart-reverse-proxy:latest
+    build:
+      context: ./reverse_proxy
+      dockerfile: Dockerfile
+    depends_on:
+      - server
+    ports:
+      - "80:80"
 
 volumes:
   data:

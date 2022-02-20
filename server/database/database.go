@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	host     = os.Getenv("DATABASE_HOST")
-	port     = os.Getenv("DATABASE_PORT")
-	user     = os.Getenv("DATABASE_USER")
-	password = os.Getenv("DATABASE_PASSWORD")
-	dbname   = os.Getenv("DATABASE_NAME")
+	host     = os.Getenv("POSTGRES_HOST")
+	port     = os.Getenv("POSTGRES_PORT")
+	user     = os.Getenv("POSTGRES_USER")
+	password = os.Getenv("POSTGRES_PASSWORD")
+	dbname   = os.Getenv("POSTGRES_DB")
 )
 
 var db *sql.DB
@@ -27,6 +27,15 @@ func Open() error {
 
 	err = db.Ping()
 	if err != nil {
+		return err
+	}
+	if err = CreatePlayersTable(); err != nil {
+		return err
+	}
+	if err = CreateRacesTable(); err != nil {
+		return err
+	}
+	if err = CreatePlayersRacesTable(); err != nil {
 		return err
 	}
 
