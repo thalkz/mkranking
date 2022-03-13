@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:kart_app/models/player.dart';
 import 'package:kart_app/models/race.dart';
+import 'package:kart_app/models/ratings_history.dart';
 
-final String? url = String.fromEnvironment("SERVER_URL", defaultValue: 'api.thalkz.com');
+final String? url = String.fromEnvironment("SERVER_URL", defaultValue: 'http://localhost');
 
 class Api {
   static _parseResponse(http.Response response) {
@@ -63,5 +64,10 @@ class Api {
       'ranking': results,
     });
     return;
+  }
+
+  static Future<RatingsHistory> getRatingsHistory() async {
+    final response = await _post('getRatingsHistory', body: {});
+    return RatingsHistory.fromJson(response);
   }
 }

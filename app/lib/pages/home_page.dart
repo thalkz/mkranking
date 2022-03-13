@@ -3,6 +3,7 @@ import 'package:kart_app/data/api.dart';
 import 'package:kart_app/models/player.dart';
 import 'package:kart_app/models/race.dart';
 import 'package:kart_app/pages/create_player_page.dart';
+import 'package:kart_app/pages/home/charts_tab.dart';
 import 'package:kart_app/pages/player_page.dart';
 import 'package:kart_app/pages/submit_results_page.dart';
 import 'package:kart_app/widgets/character_icon.dart';
@@ -32,7 +33,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _players = players;
       });
-    } catch (error) {
+    } catch (error, trace) {
+      debugPrint('$trace');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
@@ -77,32 +79,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _page == 0
-          ? RefreshIndicator(
-              onRefresh: _refreshAllPlayers,
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: _players.length + 1,
-                  itemBuilder: (_, i) {
-                    if (i == _players.length) {
-                      return _CreatePlayerButton();
-                    } else {
-                      return _RankingTile(player: _players[i]);
-                    }
-                  }),
-            )
-          : RefreshIndicator(
-              onRefresh: _refreshAllRaces,
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: _races.length,
-                  itemBuilder: (_, i) {
-                    return _RaceTile(
-                      race: _races[i],
-                      players: _getPlayersFromResults(_races[i].results),
-                    );
-                  }),
-            ),
+      body: _buildPage(),
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Nouvelle course'),
         icon: Icon(Icons.add),
@@ -113,10 +90,47 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _page,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Ranking'),
-          BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Courses')
+          BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Courses'),
+          BottomNavigationBarItem(icon: Icon(Icons.line_axis), label: 'Stats')
         ],
       ),
     );
+  }
+
+  Widget _buildPage() {
+    switch (_page) {
+      case 0:
+        return RefreshIndicator(
+          onRefresh: _refreshAllPlayers,
+          child: ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _players.length + 1,
+              itemBuilder: (_, i) {
+                if (i == _players.length) {
+                  return _CreatePlayerButton();
+                } else {
+                  return _RankingTile(player: _players[i]);
+                }
+              }),
+        );
+      case 1:
+        return RefreshIndicator(
+          onRefresh: _refreshAllRaces,
+          child: ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _races.length,
+              itemBuilder: (_, i) {
+                return _RaceTile(
+                  race: _races[i],
+                  players: _getPlayersFromResults(_races[i].results),
+                );
+              }),
+        );
+      case 2:
+        return ChartsTab();
+      default:
+        return SizedBox();
+    }
   }
 }
 
@@ -146,7 +160,7 @@ class _RaceTile extends StatelessWidget {
                             Stack(
                               children: [
                                 CharacterIcon(icon: player.icon, size: 72.0),
-                                Text('${players.indexOf(player)+1}', style: Theme.of(context).textTheme.headline5)
+                                Text('${players.indexOf(player) + 1}', style: Theme.of(context).textTheme.headline5)
                               ],
                             ),
                             SizedBox(

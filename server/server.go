@@ -49,6 +49,7 @@ func main() {
 	mux.Handle("/getAllPlayers", appHandler(api.GetAllPlayers))
 	mux.Handle("/getAllRaces", appHandler(api.GetAllRaces))
 	mux.Handle("/resetAllRatings", appHandler(api.ResetAllRatings))
+	mux.Handle("/getRatingsHistory", appHandler(api.GetRatingsHistory))
 
 	// Open database
 	if err := database.Open(); err != nil {
