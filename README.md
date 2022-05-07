@@ -43,5 +43,5 @@ This project is no longer under active developement, but there are some ideas fo
 
 ## Screenshots
 
-![](ranking.png =250x)
-![](races.png =250x)
+<img src="ranking.png" width="250"/>
+<img src="races.png" width="250"/>
