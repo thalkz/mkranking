@@ -30,13 +30,6 @@ The whole project can be deployed using docker-compose. The docker-compose confi
 - Create a `.env` file at the root of the project based on the `.env-example` file, with your configs
 - Deploy using `docker-compose build` and `docker-compose up`
 
-## Roadmap
-
-This project is no longer under active developement, but there are some ideas for the future :
-- Player score evolution, displayed as a graph
-- Account creation & login
-- Leagues, letting anyone create a league with his friends
-
 ## License 
 
 [MIT](LICENSE)
