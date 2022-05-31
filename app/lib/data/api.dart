@@ -5,7 +5,8 @@ import 'package:kart_app/models/player.dart';
 import 'package:kart_app/models/race.dart';
 import 'package:kart_app/models/ratings_history.dart';
 
-final String? url = String.fromEnvironment("SERVER_URL", defaultValue: 'http://localhost');
+const String? host = String.fromEnvironment("SERVER_HOST", defaultValue: "http://localhost");
+const String? port = String.fromEnvironment("SERVER_PORT", defaultValue: "3000");
 
 class Api {
   static _parseResponse(http.Response response) {
@@ -16,7 +17,7 @@ class Api {
 
   static _post(String endpoint, {Map? body}) async {
     var response = await http.post(
-      Uri.parse('$url/$endpoint'),
+      Uri.parse('$host:$port/$endpoint'),
       body: body != null ? json.encode(body) : null,
       headers: {
         'Content-type': 'application/json',

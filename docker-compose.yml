@@ -7,19 +7,28 @@ services:
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - data:/var/lib/postgresql/data
 
   server:
     build:
       context: ./server
+    restart: always
     env_file:
       - .env
     depends_on:
       - database
-    platform: "${PLATFORM_ARCH}"
     ports:
-      - "${HTTP_PORT}:${HTTP_PORT}"
+      - "${SERVER_PORT}:${SERVER_PORT}"
+
+  app:
+    build:
+      context: ./app
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+
 volumes:
   data:

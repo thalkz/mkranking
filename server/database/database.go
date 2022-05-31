@@ -18,7 +18,7 @@ var db *sql.DB
 
 func Open() error {
 	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	fmt.Printf("Opening database host=%s port=%s dbname=%s...\n", host, port, dbname)
+	fmt.Printf("Opening database host=%s port=%s dbname=%s\n", host, port, dbname)
 	var err error
 	db, err = sql.Open("postgres", psqlconn)
 	if err != nil {

@@ -9,5 +9,4 @@ RUN go build -o /server
 FROM alpine
 RUN apk add --no-cache ca-certificates && update-ca-certificates
 COPY --from=builder /server /server
-EXPOSE 8080 8080
 ENTRYPOINT ["/server"]

@@ -68,9 +68,9 @@ func main() {
 	handler := c.Handler(mux)
 
 	// Get port
-	httpPort := os.Getenv("HTTP_PORT")
+	httpPort := os.Getenv("SERVER_PORT")
 	if httpPort == "" {
-		httpPort = "443"
+		httpPort = "3000"
 	}
 
 	// Start server
