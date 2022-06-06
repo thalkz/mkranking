@@ -27,7 +27,9 @@ jobs:
           context: ./app
           push: true
           tags: thalkz/kart_app:latest,thalkz/kart_app:${{ steps.tagName.outputs.tag }}
-          build-args: SERVER_HOST=server,SERVER_PORT=3000
+          build-args:  |
+            SERVER_HOST=server
+            SERVER_PORT=3000
 
       - name: Build and push server image
         uses: docker/build-push-action@v2
