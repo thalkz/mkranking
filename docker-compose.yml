@@ -14,6 +14,7 @@ services:
   server:
     build:
       context: ./server
+    image: thalkz/kart_server
     restart: always
     env_file:
       - .env
@@ -25,6 +26,7 @@ services:
   app:
     build:
       context: ./app
+    image: thalkz/kart_app
     env_file:
       - .env
     ports:
