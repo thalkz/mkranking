@@ -8,19 +8,7 @@ import (
 )
 
 func ResetAllRatings(w http.ResponseWriter, req *http.Request) error {
-	players, err := database.GetAllPlayers()
-	if err != nil {
-		return err
-	}
-
-	ids := make([]int, len(players))
-	ratings := make([]float64, len(players))
-	for i := range players {
-		ids[i] = players[i].Id
-		ratings[i] = 1000.0
-	}
-
-	if err = database.UpdatePlayerRatings(ids, ratings); err != nil {
+	if err := database.ResetAllRatings(initialRating); err != nil {
 		return err
 	}
 

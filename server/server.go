@@ -25,6 +25,7 @@ func main() {
 	router.HandleFunc("/submitResults", mw.ErrorHandler(api.SubmitResults))
 	router.HandleFunc("/getAllPlayers", mw.ErrorHandler(api.GetAllPlayers))
 	router.HandleFunc("/getAllRaces", mw.ErrorHandler(api.GetAllRaces))
+	router.HandleFunc("/getPlayerRaces", mw.ErrorHandler(api.GetPlayerRaces))
 	router.HandleFunc("/resetAllRatings", mw.ErrorHandler(api.ResetAllRatings))
 	router.HandleFunc("/getRatingsHistory", mw.ErrorHandler(api.GetRatingsHistory))
 

@@ -29,30 +29,28 @@ func UpdatePlayerRating(id int, rating float64) error {
 	return err
 }
 
-func UpdatePlayerRatings(ids []int, ratings []float64) error {
-	if len(ids) != len(ratings) {
-		return fmt.Errorf("ids %v and ratings %v should have the same length", ids, ratings)
-	}
+func ResetAllRatings(rating float64) error {
 	tx, err := db.Begin()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to begin tx: %w", err)
 	}
 	defer tx.Rollback()
 
-	for i := range ids {
-		_, err := db.Exec("UPDATE players SET rating = $1 WHERE id = $2", ratings[i], ids[i])
-		if err != nil {
-			return err
-		}
+	_, err = db.Exec("UPDATE players SET rating = $1", rating)
+	if err != nil {
+		return fmt.Errorf("failed to update players: %w", err)
 	}
 	err = tx.Commit()
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to commit tx: %w", err)
+	}
+	return nil
 }
 
 func GetPlayer(id int) (models.Player, error) {
 	row := db.QueryRow("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players WHERE id = $1", id)
 	var player models.Player
-	err := row.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank)
+	err := row.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
 	return player, err
 }
 
@@ -65,7 +63,7 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
-		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank)
+		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +88,7 @@ func GetAllPlayers() ([]models.Player, error) {
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
-		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank)
+		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
 		if err != nil {
 			return nil, err
 		}

@@ -70,7 +70,8 @@ func createPlayersTable() error {
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		name text NOT NULL,
 		rating double precision NOT NULL,
-		icon integer NOT NULL
+		icon integer NOT NULL,
+		races_count integer NOT NULL DEFAULT 0
 	);`
 	_, err := db.Exec(statement)
 	return err

@@ -43,7 +43,7 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) error {
 
 	// Update players with current rating
 	for i, userId := range ranking {
-		_, err := db.Exec("UPDATE players SET rating = $1 WHERE id = $2", newRatings[i], userId)
+		_, err := db.Exec("UPDATE players SET rating = $1, races_count = races_count + 1 WHERE id = $2", newRatings[i], userId)
 		if err != nil {
 			return fmt.Errorf("failed to update player %v: %w", userId, err)
 		}
@@ -68,7 +68,7 @@ func GetRace(id int) (models.Race, error) {
 }
 
 func GetAllRaces() ([]models.Race, error) {
-	rows, err := db.Query("SELECT * FROM races")
+	rows, err := db.Query("SELECT * FROM races ORDER BY date")
 	races := make([]models.Race, 0)
 	var ranking pq.Int64Array
 	for rows.Next() {
@@ -83,4 +83,38 @@ func GetAllRaces() ([]models.Race, error) {
 		races = append(races, race)
 	}
 	return races, err
+}
+
+func GetPlayerTotalRaceCount(userId int) (int, error) {
+	row := db.QueryRow("SELECT COUNT(*) FROM players_races WHERE user_id = $1", userId)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("failed to count total races for %v: %w", userId, err)
+	}
+	return count, nil
+}
+
+func GetPlayerRaces(userId int) ([]models.Race, error) {
+	rows, err := db.Query(`SELECT races.id, races.ranking, races.date
+		FROM races JOIN players_races ON players_races.race_id = races.id 
+		WHERE user_id = $1
+		ORDER BY date`, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query races for player %v: %w", userId, err)
+	}
+
+	races := make([]models.Race, 0)
+	var ranking pq.Int64Array
+	for rows.Next() {
+		var race models.Race
+		err = rows.Scan(&race.Id, &ranking, &race.Date)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan race row: %w", err)
+		}
+		for i := range ranking {
+			race.Results = append(race.Results, (int)(ranking[i]))
+		}
+		races = append(races, race)
+	}
+	return races, nil
 }
