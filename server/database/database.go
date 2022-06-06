@@ -16,40 +16,83 @@ var (
 
 var db *sql.DB
 
-func Open() error {
+func Open() (func() error, error) {
+	// Default config variables
+	if host == "" {
+		host = "localhost"
+	}
+	if port == "" {
+		port = "5432"
+	}
+	if user == "" {
+		user = "postgres"
+	}
+	if password == "" {
+		password = "postgres"
+	}
+	if dbname == "" {
+		dbname = "postgres"
+	}
+
+	// Open database connection
 	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	fmt.Printf("Opening database host=%s port=%s dbname=%s\n", host, port, dbname)
 	var err error
 	db, err = sql.Open("postgres", psqlconn)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("failed to connect %w", err)
 	}
 
+	// Check database connection
 	err = db.Ping()
 	if err != nil {
-		return err
-	}
-	if err = CreatePlayersTable(); err != nil {
-		return err
-	}
-	if err = CreateRacesTable(); err != nil {
-		return err
-	}
-	if err = CreatePlayersRacesTable(); err != nil {
-		return err
+		return nil, fmt.Errorf("failed to ping %w", err)
 	}
 
-	fmt.Println("Database is opened")
-	return nil
+	// Create tables if missing
+	if err = createPlayersTable(); err != nil {
+		return nil, fmt.Errorf("failed to create players table %w", err)
+	}
+	if err = createRacesTable(); err != nil {
+		return nil, fmt.Errorf("failed to create races table %w", err)
+	}
+	if err = createPlayersRacesTable(); err != nil {
+		return nil, fmt.Errorf("failed to create players_races table %w", err)
+	}
+
+	return db.Close, nil
 }
 
-func ExecRaw(statement string) (sql.Result, error) {
-	fmt.Printf("[Database] %s\n", statement)
-	result, err := db.Exec(statement)
-	return result, err
+func createPlayersTable() error {
+	statement := `
+	CREATE TABLE IF NOT EXISTS players (
+		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+		name text NOT NULL,
+		rating double precision NOT NULL,
+		icon integer NOT NULL
+	);`
+	_, err := db.Exec(statement)
+	return err
 }
 
-func Close() {
-	db.Close()
-	fmt.Println("Database is closed")
+func createRacesTable() error {
+	statement := `
+	CREATE TABLE IF NOT EXISTS races (
+		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+		ranking integer[] NOT NULL,
+		date timestamp without time zone NOT NULL
+	);`
+	_, err := db.Exec(statement)
+	return err
+}
+
+func createPlayersRacesTable() error {
+	statement := `
+	CREATE TABLE IF NOT EXISTS players_races (
+		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE ON UPDATE CASCADE,
+		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE ON UPDATE CASCADE
+	);`
+	_, err := db.Exec(statement)
+	return err
 }

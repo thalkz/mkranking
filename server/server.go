@@ -18,8 +18,10 @@ import (
 type appHandler func(http.ResponseWriter, *http.Request) error
 
 func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	err := fn(w, r)
-	logRequest(r)
+	end := time.Now()
+	logRequest(r, start, end)
 	if err != nil {
 		bytes, _ := json.Marshal(&api.JsonResponse{
 			Status: "error",
@@ -30,42 +32,38 @@ func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logRequest(r *http.Request) {
-	now := time.Now().Format("2006-01-02 15:04:05")
+func logRequest(r *http.Request, start, end time.Time) {
 	ipAddr := strings.Split(r.RemoteAddr, ":")[0]
-	fmt.Printf("[%v] %v %v %v\n", now, ipAddr, r.Method, r.URL)
+	duration := end.UnixMilli() - start.UnixMilli()
+	fmt.Printf("[%v] %v %v %v (%vms)\n", start.Format("2006-01-02 15:04:05"), ipAddr, r.Method, r.URL, duration)
 }
 
 func main() {
-	mux := http.NewServeMux()
+	router := http.NewServeMux()
 
-	// Add routes
-	mux.Handle("/hello", appHandler(api.Hello))
-	mux.Handle("/getPlayer", appHandler(api.GetPlayer))
-	mux.Handle("/createPlayer", appHandler(api.CreatePlayer))
-	mux.Handle("/updatePlayer", appHandler(api.UpdatePlayer))
-	mux.Handle("/deletePlayer", appHandler(api.DeletePlayer))
-	mux.Handle("/submitResults", appHandler(api.SubmitResults))
-	mux.Handle("/getAllPlayers", appHandler(api.GetAllPlayers))
-	mux.Handle("/getAllRaces", appHandler(api.GetAllRaces))
-	mux.Handle("/resetAllRatings", appHandler(api.ResetAllRatings))
-	mux.Handle("/getRatingsHistory", appHandler(api.GetRatingsHistory))
+	// Setup routes
+	router.Handle("/hello", appHandler(api.Hello))
+	router.Handle("/getPlayer", appHandler(api.GetPlayer))
+	router.Handle("/createPlayer", appHandler(api.CreatePlayer))
+	router.Handle("/updatePlayer", appHandler(api.UpdatePlayer))
+	router.Handle("/deletePlayer", appHandler(api.DeletePlayer))
+	router.Handle("/submitResults", appHandler(api.SubmitResults))
+	router.Handle("/getAllPlayers", appHandler(api.GetAllPlayers))
+	router.Handle("/getAllRaces", appHandler(api.GetAllRaces))
+	router.Handle("/resetAllRatings", appHandler(api.ResetAllRatings))
+	router.Handle("/getRatingsHistory", appHandler(api.GetRatingsHistory))
 
 	// Open database
-	if err := database.Open(); err != nil {
+	var cleanup, err = database.Open()
+	if err != nil {
 		panic(err)
 	}
-	defer database.Close()
+	fmt.Println("Database is opened")
+	defer cleanup()
 
-	// Enable CORS
-	// c := cors.New(cors.Options{
-	// 	AllowedOrigins:   []string{"http://kart.thalkz.com"},
-	// 	AllowCredentials: true,
-	// 	// Enable Debugging for testing, consider disabling in production
-	// 	Debug: true,
-	// })
-	c := cors.AllowAll()
-	handler := c.Handler(mux)
+	// Add CORS middleware
+	c := cors.Default()
+	handler := c.Handler(router)
 
 	// Get port
 	httpPort := os.Getenv("SERVER_PORT")
@@ -75,7 +73,7 @@ func main() {
 
 	// Start server
 	fmt.Println("Listening on port", httpPort)
-	err := http.ListenAndServe(":"+httpPort, handler)
+	err = http.ListenAndServe(":"+httpPort, handler)
 	if err != nil {
 		panic(err)
 	}
