@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kart_app/notifiers/player_notifier.dart';
 import 'package:kart_app/widgets/character_icon.dart';
+import 'package:kart_app/widgets/race_tile.dart';
 import 'package:provider/provider.dart';
 
 class PlayerPage extends StatelessWidget {
@@ -33,9 +34,12 @@ class PlayerPage extends StatelessWidget {
             children: [
               CharacterIcon(icon: notifier.player.icon, size: 120.0),
               SizedBox(height: 16.0),
-              Center(child: Text('${notifier.player.rank}', style: Theme.of(context).textTheme.headline5)),
+              Center(child: Text('#${notifier.player.rank}', style: Theme.of(context).textTheme.headline5)),
               SizedBox(height: 16.0),
-              Center(child: Text('${notifier.player.rating.toInt()}')),
+              Center(child: Text('${notifier.player.rating.toInt()} pts')),
+              Center(child: Text('${notifier.player.racesCount} courses')),
+              SizedBox(height: 16),
+              ...notifier.races.map((race) => RaceTile(race: race)).toList()
             ],
           ),
         ),

@@ -40,7 +40,7 @@ class _RankingTile extends StatelessWidget {
     return ListTile(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PlayerPage(id: player.id))),
       title: Text(player.name),
-      subtitle: Text(player.rating.toInt().toString()),
+      subtitle: Text('${player.rating.toInt()} pts • ${player.racesCount} courses'),
       leading: CharacterIcon(icon: player.icon),
       trailing: Text(
         player.rank.toString(),

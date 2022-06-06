@@ -44,6 +44,13 @@ class Api {
     return List.from(data).map((value) => Race.fromJson(value)).toList()..sort((a, b) => b.date.compareTo(a.date));
   }
 
+  static Future<List<Race>> getPlayerRaces(int id) async {
+    final data = await _post('getPlayerRaces', body: {
+      'id': id,
+    });
+    return List.from(data).map((value) => Race.fromJson(value)).toList()..sort((a, b) => b.date.compareTo(a.date));
+  }
+
   static Future<Player> getPlayer(int id) async {
     final data = await _post('getPlayer', body: {
       'id': id,

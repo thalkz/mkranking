@@ -1,10 +1,10 @@
 package models
 
 type Player struct {
-	Id        int     `json:"id"`
-	Name      string  `json:"name"`
-	Rank      int     `json:"rank"`
-	Icon      int     `json:"icon"`
-	Rating    float64 `json:"rating"`
-	RaceCount int     `json:"race_count"`
+	Id         int     `json:"id"`
+	Name       string  `json:"name"`
+	Rank       int     `json:"rank"`
+	Icon       int     `json:"icon"`
+	Rating     float64 `json:"rating"`
+	RacesCount int     `json:"races_count"`
 }

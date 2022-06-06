@@ -55,14 +55,6 @@ class AppNotifier with ChangeNotifier {
     }
   }
 
-  List<Player> getPlayersFromResults(List<int> results) {
-    final List<Player> selected = [];
-    for (final id in results) {
-      selected.add(players.firstWhere((player) => player.id == id, orElse: () => Player.empty()));
-    }
-    return selected;
-  }
-
   Future<void> initCharts() async {
     if (history.playerNames.isNotEmpty) return;
     try {
@@ -80,5 +72,9 @@ class AppNotifier with ChangeNotifier {
     } catch (error) {
       _showSnackBar(error.toString());
     }
+  }
+
+  Player getPlayer(int playerId) {
+    return players.firstWhere((player) => player.id == playerId);
   }
 }
