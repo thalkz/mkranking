@@ -47,7 +47,7 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
       appBar: AppBar(title: Text('Nouvelle course')),
       body: _participants.isEmpty
           ? ListView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 100.0),
               children: _players.entries
                   .map((entry) => CheckboxListTile(
                         title: Row(
@@ -66,7 +66,7 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
                       ))
                   .toList())
           : ReorderableListView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 100.0),
               children: _participants
                   .map((player) => ListTile(
                         key: Key('${player.id}'),
