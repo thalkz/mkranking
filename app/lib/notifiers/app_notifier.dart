@@ -16,17 +16,34 @@ class AppNotifier with ChangeNotifier {
     scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(text)));
   }
 
-  Future<void> refreshPlayers() async {
+  Future<void> refreshAll() async {
     try {
-      players = await Api.getAllPlayers();
+      final results = await Future.wait([
+        Api.getAllPlayers(),
+        Api.getAllRaces(),
+        Api.getRatingsHistory(),
+      ]);
+      players = results[0] as List<Player>;
+      races = results[1] as List<Race>;
+      history = results[2] as RatingsHistory;
       notifyListeners();
-    } catch (error, trace) {
-      debugPrint('$trace');
+    } catch (error) {
       _showSnackBar(error.toString());
     }
   }
 
-  Future<void> refreshRaces() async {
+  Future<void> initPlayers() async {
+    if (players.isNotEmpty) return;
+    try {
+      players = await Api.getAllPlayers();
+      notifyListeners();
+    } catch (error) {
+      _showSnackBar(error.toString());
+    }
+  }
+
+  Future<void> initRaces() async {
+    if (races.isNotEmpty) return;
     try {
       races = await Api.getAllRaces();
       notifyListeners();
@@ -43,12 +60,31 @@ class AppNotifier with ChangeNotifier {
     return selected;
   }
 
-  Future<void> refreshCharts() async {
+  Future<void> initCharts() async {
+    if (history.playerNames.isNotEmpty) return;
     try {
       history = await Api.getRatingsHistory();
       notifyListeners();
     } catch (error) {
       _showSnackBar(error.toString());
     }
+  }
+
+  Future<void> submitResults(List<int> participantIds) async {
+    try {
+      await Api.submitResults(participantIds);
+    } catch (error) {
+      _showSnackBar(error.toString());
+    }
+    await refreshAll();
+  }
+
+  Future<void> createPlayer({required String name, required int icon}) async {
+    try {
+      await Api.createPlayer(name: name, icon: icon);
+    } catch (error) {
+      _showSnackBar(error.toString());
+    }
+    await refreshAll();
   }
 }

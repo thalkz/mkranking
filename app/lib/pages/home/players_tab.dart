@@ -12,7 +12,7 @@ class PlayersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: context.read<AppNotifier>().refreshPlayers,
+      onRefresh: context.read<AppNotifier>().refreshAll,
       child: Consumer<AppNotifier>(
         builder: (context, notifier, _) => ListView.builder(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 100.0),

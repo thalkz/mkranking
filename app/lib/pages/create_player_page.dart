@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kart_app/data/api.dart';
 import 'package:kart_app/data/characters.dart';
+import 'package:kart_app/notifiers/app_notifier.dart';
 import 'package:kart_app/widgets/character_icon.dart';
+import 'package:provider/provider.dart';
 
 class CreatePlayerPage extends StatefulWidget {
   CreatePlayerPage({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class _CreatePlayerPageState extends State<CreatePlayerPage> {
   int _icon = 0;
 
   Future<void> _createPlayer() async {
-    await Api.createPlayer(name: _textController.text, icon: _icon);
+    await context.read<AppNotifier>().createPlayer(name: _textController.text, icon: _icon);
     Navigator.pop(context);
   }
 
@@ -23,11 +24,6 @@ class _CreatePlayerPageState extends State<CreatePlayerPage> {
     setState(() {
       _icon = icon;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override

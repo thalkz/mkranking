@@ -24,13 +24,13 @@ class _HomePageState extends State<HomePage> {
     });
     switch (page) {
       case 0:
-        context.read<AppNotifier>().refreshPlayers();
+        context.read<AppNotifier>().initPlayers();
         break;
       case 1:
-        context.read<AppNotifier>().refreshRaces();
+        context.read<AppNotifier>().initRaces();
         break;
       case 2:
-        context.read<AppNotifier>().refreshCharts();
+        context.read<AppNotifier>().initCharts();
         break;
     }
   }
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<AppNotifier>().refreshPlayers());
+    Future.microtask(() => context.read<AppNotifier>().initPlayers());
   }
 
   @override

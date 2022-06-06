@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kart_app/data/api.dart';
 import 'package:kart_app/models/player.dart';
+import 'package:kart_app/notifiers/app_notifier.dart';
 import 'package:kart_app/widgets/character_icon.dart';
+import 'package:provider/provider.dart';
 
 class SubmitResultsPage extends StatefulWidget {
   const SubmitResultsPage({Key? key}) : super(key: key);
@@ -14,8 +15,8 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
   Map<Player, bool> _players = {};
   List<Player> _participants = [];
 
-  void _refreshAllPlayers() async {
-    final players = await Api.getAllPlayers();
+  void _initPlayers() async {
+    final players = context.read<AppNotifier>().players;
     setState(() {
       for (final player in players) {
         _players.putIfAbsent(player, () => false);
@@ -31,14 +32,14 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
 
   Future<void> _submitResults() async {
     final ids = _participants.map((player) => player.id).toList();
-    await Api.submitResults(ids);
+    await context.read<AppNotifier>().submitResults(ids);
     Navigator.pop(context);
   }
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _refreshAllPlayers());
+    Future.microtask(() => _initPlayers());
   }
 
   @override
