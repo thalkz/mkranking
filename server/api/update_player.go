@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/thalkz/kart/database"
@@ -24,7 +24,7 @@ func UpdatePlayer(w http.ResponseWriter, req *http.Request) error {
 	if err := json.Unmarshal(b, &body); err != nil {
 		return err
 	}
-	fmt.Printf("Updating %v\n", body.Name)
+	log.Printf("Updating %v\n", body.Name)
 
 	err = database.UpdatePlayerName(body.Id, body.Name)
 	if err != nil {

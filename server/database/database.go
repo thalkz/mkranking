@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -36,7 +37,7 @@ func Open() (func() error, error) {
 
 	// Open database connection
 	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	fmt.Printf("Opening database host=%s port=%s dbname=%s\n", host, port, dbname)
+	log.Printf("Opening database host=%s port=%s dbname=%s\n", host, port, dbname)
 	var err error
 	db, err = sql.Open("postgres", psqlconn)
 	if err != nil {
@@ -91,7 +92,10 @@ func createPlayersRacesTable() error {
 	CREATE TABLE IF NOT EXISTS players_races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE ON UPDATE CASCADE,
-		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE ON UPDATE CASCADE
+		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE ON UPDATE CASCADE,
+		old_rating real NOT NULL DEFAULT 1000,
+		new_rating real NOT NULL DEFAULT 1000,
+		rating_diff real NOT NULL DEFAULT 0
 	);`
 	_, err := db.Exec(statement)
 	return err

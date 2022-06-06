@@ -13,7 +13,11 @@ class AppNotifier with ChangeNotifier {
   AppNotifier({required this.scaffoldKey});
 
   void _showSnackBar(String text) {
-    scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(text)));
+    print(text);
+    scaffoldKey.currentState?.showSnackBar(SnackBar(
+      content: Text(text),
+      backgroundColor: Colors.red,
+    ));
   }
 
   Future<void> refreshAll() async {
@@ -73,18 +77,18 @@ class AppNotifier with ChangeNotifier {
   Future<void> submitResults(List<int> participantIds) async {
     try {
       await Api.submitResults(participantIds);
+      await refreshAll();
     } catch (error) {
       _showSnackBar(error.toString());
     }
-    await refreshAll();
   }
 
   Future<void> createPlayer({required String name, required int icon}) async {
     try {
       await Api.createPlayer(name: name, icon: icon);
+      await refreshAll();
     } catch (error) {
       _showSnackBar(error.toString());
     }
-    await refreshAll();
   }
 }

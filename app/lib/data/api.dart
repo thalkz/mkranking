@@ -11,7 +11,11 @@ const String? port = String.fromEnvironment("SERVER_PORT", defaultValue: "3000")
 class Api {
   static _parseResponse(http.Response response) {
     final json = Map<String, dynamic>.from(jsonDecode(response.body));
-    print("<- ${response.statusCode} $json");
+    if (json['status'] == "ok") {
+      print("<- ${response.statusCode} $json");
+    } else {
+      throw Exception("ServerException: ${json["status"]} ${json["error"]}");
+    }
     return json['data'];
   }
 
@@ -60,11 +64,10 @@ class Api {
     return int.tryParse('$data') ?? 0;
   }
 
-  static Future<void> submitResults(List<int> results) async {
-    await _post('submitResults', body: {
+  static Future<void> submitResults(List<int> results) {
+    return _post('submitResults', body: {
       'ranking': results,
     });
-    return;
   }
 
   static Future<RatingsHistory> getRatingsHistory() async {

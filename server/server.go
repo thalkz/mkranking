@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -33,7 +33,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Database is opened")
+	log.Println("Database is opened")
 	defer cleanup()
 
 	// Add CORS middleware
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// Start server
-	fmt.Println("Listening on port", httpPort)
+	log.Println("Listening on port", httpPort)
 	err = http.ListenAndServe(":"+httpPort, handler)
 	if err != nil {
 		panic(err)

@@ -8,24 +8,24 @@ import (
 )
 
 func CreatePlayer(name string, rating float64, icon int) (int, error) {
-	row := db.QueryRow("INSERT INTO players (name, rating, icon) values ($1, $2, $3) RETURNING id", name, rating, icon)
+	row := db.QueryRow("INSERT INTO players (name, rating, icon) VALUES ($1, $2, $3) RETURNING id", name, rating, icon)
 	var id int
 	err := row.Scan(&id)
 	return id, err
 }
 
 func DeletePlayer(id int) error {
-	_, err := db.Exec("DELETE FROM players where id = $1", id)
+	_, err := db.Exec("DELETE FROM players WHERE id = $1", id)
 	return err
 }
 
 func UpdatePlayerName(id int, name string) error {
-	_, err := db.Exec("UPDATE players SET name = $1 where id = $2", name, id)
+	_, err := db.Exec("UPDATE players SET name = $1 WHERE id = $2", name, id)
 	return err
 }
 
 func UpdatePlayerRating(id int, rating float64) error {
-	_, err := db.Exec("UPDATE players SET rating = $1 where id = $2", rating, id)
+	_, err := db.Exec("UPDATE players SET rating = $1 WHERE id = $2", rating, id)
 	return err
 }
 
@@ -40,7 +40,7 @@ func UpdatePlayerRatings(ids []int, ratings []float64) error {
 	defer tx.Rollback()
 
 	for i := range ids {
-		_, err := db.Exec("UPDATE players SET rating = $1 where id = $2", ratings[i], ids[i])
+		_, err := db.Exec("UPDATE players SET rating = $1 WHERE id = $2", ratings[i], ids[i])
 		if err != nil {
 			return err
 		}
@@ -50,7 +50,7 @@ func UpdatePlayerRatings(ids []int, ratings []float64) error {
 }
 
 func GetPlayer(id int) (models.Player, error) {
-	row := db.QueryRow("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players where id = $1", id)
+	row := db.QueryRow("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players WHERE id = $1", id)
 	var player models.Player
 	err := row.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank)
 	return player, err

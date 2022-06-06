@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/thalkz/kart/api"
@@ -16,8 +16,8 @@ func ErrorHandler(fn func(http.ResponseWriter, *http.Request) error) http.Handle
 				Status: "error",
 				Error:  err.Error(),
 			})
-			fmt.Println("Error: ", r.URL, err)
-			http.Error(w, string(bytes), 500)
+			log.Println("Error:", r.URL, err)
+			http.Error(w, string(bytes), http.StatusInternalServerError)
 		}
 	}
 }

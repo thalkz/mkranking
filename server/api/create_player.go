@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/thalkz/kart/database"
@@ -32,7 +32,7 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Creating %v\n", body.Name)
+	log.Printf("Creating %v\n", body.Name)
 
 	id, err := database.CreatePlayer(body.Name, initialRating, body.Icon)
 	if err != nil {

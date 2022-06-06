@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/thalkz/kart/database"
@@ -29,27 +30,24 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 		return fmt.Errorf("cannot submit results with less than two players. recieved %v", body.Ranking)
 	}
 
-	fmt.Printf("Creating race with ranking: %v\n", body.Ranking)
-	if err := database.CreateRace(body.Ranking); err != nil {
-		return err
-	}
-
 	players, err := database.GetPlayers(body.Ranking)
-	fmt.Printf("Getting players: %v\n", players)
+	log.Printf("Getting players: %v\n", players)
 	if err != nil {
 		return err
 	}
 
-	ratings := make([]float64, len(players))
+	oldRatings := make([]float64, len(players))
 	for i := range players {
-		ratings[i] = players[i].Rating
+		oldRatings[i] = players[i].Rating
 	}
 
-	fmt.Printf("Computing elo with ratings: %v\n", ratings)
-	newRatings := elo.ComputeRatings(ratings)
+	log.Printf("Computing elo with ratings: %v\n", oldRatings)
+	newRatings := elo.ComputeRatings(oldRatings)
 
-	fmt.Printf("New ratings are %v\n", newRatings)
-	if err := database.UpdatePlayerRatings(body.Ranking, newRatings); err != nil {
+	log.Printf("New ratings are %v\n", newRatings)
+
+	log.Printf("Creating race with ranking: %v\n", body.Ranking)
+	if err := database.CreateRace(body.Ranking, oldRatings, newRatings); err != nil {
 		return err
 	}
 
