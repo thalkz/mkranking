@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kart_app/models/player.dart';
 import 'package:kart_app/notifiers/app_notifier.dart';
+import 'package:kart_app/notifiers/submit_results_notifier.dart';
 import 'package:kart_app/widgets/character_icon.dart';
 import 'package:provider/provider.dart';
-
-import '../notifiers/submit_results_notifier.dart';
 
 class SubmitResultsPage extends StatelessWidget {
   const SubmitResultsPage({Key? key}) : super(key: key);
@@ -29,7 +28,10 @@ class SubmitResultsPage extends StatelessWidget {
         floatingActionButton: Consumer<SubmitResultsNotifier>(builder: (context, notifier, _) {
           if (notifier.ratingsDiff.isNotEmpty) {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                context.read<AppNotifier>().refreshAll();
+                Navigator.pop(context);
+              },
               icon: Icon(Icons.navigate_next),
               label: Text('Ok'),
             );

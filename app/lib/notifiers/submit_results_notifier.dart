@@ -25,9 +25,7 @@ class SubmitResultsNotifier with ChangeNotifier {
     try {
       final rankedIds = rankedParticipants.map((player) => player.id).toList();
       final response = await Api.submitResults(rankedIds);
-      print(response.ratingsDiff);
       ratingsDiff = selectedPlayers.map((player, _) => MapEntry(player, response.ratingsDiff[player.id] ?? 0));
-      print(ratingsDiff);
       notifyListeners();
     } catch (error) {
       _showSnackBar(error.toString());

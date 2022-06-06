@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kart_app/notifiers/app_notifier.dart';
 import 'package:kart_app/notifiers/player_notifier.dart';
 import 'package:kart_app/widgets/character_icon.dart';
 import 'package:kart_app/widgets/race_tile.dart';
@@ -22,6 +23,7 @@ class PlayerPage extends StatelessWidget {
             IconButton(
               onPressed: () async {
                 await context.read<PlayerNotifier>().deletePlayer();
+                context.read<AppNotifier>().refreshAll();
                 Navigator.pop(context);
               },
               icon: Icon(Icons.delete_outline),

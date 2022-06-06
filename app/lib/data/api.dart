@@ -10,16 +10,6 @@ const String? host = String.fromEnvironment("SERVER_HOST", defaultValue: "http:/
 const String? port = String.fromEnvironment("SERVER_PORT", defaultValue: "3000");
 
 class Api {
-  static _parseResponse(http.Response response) {
-    final json = Map<String, dynamic>.from(jsonDecode(response.body));
-    if (json['status'] == "ok") {
-      print("<- ${response.statusCode} $json");
-    } else {
-      throw Exception("ServerException: ${json["status"]} ${json["error"]}");
-    }
-    return json['data'];
-  }
-
   static _post(String endpoint, {Map? body}) async {
     var response = await http.post(
       Uri.parse('$host:$port/$endpoint'),
@@ -29,8 +19,19 @@ class Api {
         'Accept': 'application/json',
       },
     );
-    print(response.request);
-    return _parseResponse(response);
+
+    if (response.statusCode == 500) {
+      final res = Map<String, dynamic>.from(jsonDecode(response.body));
+      print('[http] $endpoint ${res["status"]} — ${res["error"]}');
+      throw Exception("$endpoint ${res["status"]} ${res["error"]}");
+    } else if (response.statusCode == 200) {
+      final res = Map<String, dynamic>.from(jsonDecode(response.body));
+      print('[http] $endpoint ${res["status"]}');
+      return res['data'];
+    } else {
+      print('[http] $endpoint ${response.body}');
+      throw Exception("$endpoint — ${response.body}");
+    }
   }
 
   static Future<List<Player>> getAllPlayers() async {
@@ -79,8 +80,11 @@ class Api {
     return SubmitResultsResponse.fromJson(response);
   }
 
-  static Future<RatingsHistory> getRatingsHistory() async {
-    final response = await _post('getRatingsHistory', body: {});
-    return RatingsHistory.fromJson(response);
+  static Future<History> getHistory(List<Player> players) async {
+    final ids = players.map((player) => player.id).toList();
+    final response = await _post('getHistory', body: {
+      'ids': ids,
+    });
+    return History.fromJson(response);
   }
 }

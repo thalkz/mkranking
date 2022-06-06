@@ -8,7 +8,7 @@ class AppNotifier with ChangeNotifier {
   final GlobalKey<ScaffoldMessengerState> scaffoldKey;
   List<Player> players = [];
   List<Race> races = [];
-  RatingsHistory history = RatingsHistory.empty();
+  History history = History.empty();
 
   AppNotifier({required this.scaffoldKey});
 
@@ -24,11 +24,10 @@ class AppNotifier with ChangeNotifier {
       final results = await Future.wait([
         Api.getAllPlayers(),
         Api.getAllRaces(),
-        Api.getRatingsHistory(),
       ]);
       players = results[0] as List<Player>;
       races = results[1] as List<Race>;
-      history = results[2] as RatingsHistory;
+      history = await Api.getHistory(players);
       notifyListeners();
     } catch (error) {
       _showSnackBar(error.toString());
@@ -56,9 +55,9 @@ class AppNotifier with ChangeNotifier {
   }
 
   Future<void> initCharts() async {
-    if (history.playerNames.isNotEmpty) return;
+    if (history.playerIds.isNotEmpty) return;
     try {
-      history = await Api.getRatingsHistory();
+      history = await Api.getHistory(players);
       notifyListeners();
     } catch (error) {
       _showSnackBar(error.toString());
@@ -75,6 +74,10 @@ class AppNotifier with ChangeNotifier {
   }
 
   Player getPlayer(int playerId) {
-    return players.firstWhere((player) => player.id == playerId);
+    try {
+      return players.firstWhere((player) => player.id == playerId);
+    } catch (error) {
+      return Player.empty();
+    }
   }
 }

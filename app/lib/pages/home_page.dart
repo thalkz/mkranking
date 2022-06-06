@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kart_app/notifiers/app_notifier.dart';
 import 'package:kart_app/pages/home/charts_tab.dart';
 import 'package:kart_app/pages/home/players_tab.dart';
+import 'package:kart_app/pages/home/races_tab.dart';
 import 'package:kart_app/pages/submit_results_page.dart';
 import 'package:provider/provider.dart';
-
-import 'home/races_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
