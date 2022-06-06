@@ -67,6 +67,7 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
                       ))
                   .toList())
           : ReorderableListView(
+              buildDefaultDragHandles: false,
               padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 100.0),
               children: _participants
                   .map((player) => ListTile(
@@ -76,6 +77,10 @@ class _SubmitResultsPageState extends State<SubmitResultsPage> {
                           style: Theme.of(context).textTheme.headline4,
                         ),
                         title: Text(player.name),
+                        trailing: ReorderableDragStartListener(
+                          index: _participants.indexOf(player),
+                          child: Icon(Icons.reorder_rounded),
+                        ),
                       ))
                   .toList(),
               onReorder: (int oldIndex, int newIndex) {
