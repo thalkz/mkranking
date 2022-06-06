@@ -13,7 +13,6 @@ class AppNotifier with ChangeNotifier {
   AppNotifier({required this.scaffoldKey});
 
   void _showSnackBar(String text) {
-    print(text);
     scaffoldKey.currentState?.showSnackBar(SnackBar(
       content: Text(text),
       backgroundColor: Colors.red,
@@ -69,15 +68,6 @@ class AppNotifier with ChangeNotifier {
     try {
       history = await Api.getRatingsHistory();
       notifyListeners();
-    } catch (error) {
-      _showSnackBar(error.toString());
-    }
-  }
-
-  Future<void> submitResults(List<int> participantIds) async {
-    try {
-      await Api.submitResults(participantIds);
-      await refreshAll();
     } catch (error) {
       _showSnackBar(error.toString());
     }

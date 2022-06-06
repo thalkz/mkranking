@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:kart_app/models/player.dart';
 import 'package:kart_app/models/race.dart';
 import 'package:kart_app/models/ratings_history.dart';
+import 'package:kart_app/models/submit_results_response.dart';
 
 const String? host = String.fromEnvironment("SERVER_HOST", defaultValue: "http://localhost");
 const String? port = String.fromEnvironment("SERVER_PORT", defaultValue: "3000");
@@ -64,10 +65,11 @@ class Api {
     return int.tryParse('$data') ?? 0;
   }
 
-  static Future<void> submitResults(List<int> results) {
-    return _post('submitResults', body: {
+  static Future<SubmitResultsResponse> submitResults(List<int> results) async {
+    final response = await _post('submitResults', body: {
       'ranking': results,
     });
+    return SubmitResultsResponse.fromJson(response);
   }
 
   static Future<RatingsHistory> getRatingsHistory() async {

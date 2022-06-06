@@ -48,14 +48,14 @@ func ResetAllRatings(rating float64) error {
 }
 
 func GetPlayer(id int) (models.Player, error) {
-	row := db.QueryRow("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players WHERE id = $1", id)
+	row := db.QueryRow("SELECT *, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE id = $1", id)
 	var player models.Player
-	err := row.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
+	err := row.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.RaceCount, &player.Rank)
 	return player, err
 }
 
 func GetPlayers(playerIds []int) ([]models.Player, error) {
-	rows, err := db.Query("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players WHERE id = ANY($1)", pq.Array(playerIds))
+	rows, err := db.Query("SELECT *, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE id = ANY($1)", pq.Array(playerIds))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
-		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
+		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.RaceCount, &player.Rank)
 		if err != nil {
 			return nil, err
 		}
@@ -84,11 +84,11 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 }
 
 func GetAllPlayers() ([]models.Player, error) {
-	rows, err := db.Query("SELECT *, RANK () OVER ( ORDER BY rating DESC ) rank FROM players")
+	rows, err := db.Query("SELECT *, RANK() OVER (ORDER BY rating DESC) rank FROM players")
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
-		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.Rank, &player.RaceCount)
+		err = rows.Scan(&player.Id, &player.Name, &player.Rating, &player.Icon, &player.RaceCount, &player.Rank)
 		if err != nil {
 			return nil, err
 		}
