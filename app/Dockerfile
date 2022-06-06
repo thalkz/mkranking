@@ -1,6 +1,10 @@
 # Stage 1) Building Flutter web
 FROM ubuntu:20.04 as builder
 
+# Define build args
+ARG SERVER_HOST
+ARG SERVER_PORT
+
 RUN apt update && apt install -y curl git unzip xz-utils zip libglu1-mesa
 
 # download Flutter SDK from Flutter Github repo
@@ -21,7 +25,7 @@ RUN flutter config --enable-web
 RUN mkdir /app/
 COPY . /app/
 WORKDIR /app/
-RUN flutter build web
+RUN flutter build web --dart-define=SERVER_HOST=$SERVER_HOST --dart-define=SERVER_PORT=$SERVER_PORT
 
 # Stage 2) Running the web server
 FROM nginx

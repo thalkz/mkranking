@@ -62,7 +62,7 @@ func main() {
 	defer cleanup()
 
 	// Add CORS middleware
-	c := cors.Default()
+	c := cors.AllowAll()
 	handler := c.Handler(router)
 
 	// Get port

@@ -6,8 +6,8 @@ import 'package:kart_app/models/race.dart';
 import 'package:kart_app/models/ratings_history.dart';
 import 'package:kart_app/models/submit_results_response.dart';
 
-final String? host = String.fromEnvironment("SERVER_HOST", defaultValue: "http://localhost");
-final String? port = String.fromEnvironment("SERVER_PORT", defaultValue: "3000");
+const String? host = String.fromEnvironment("SERVER_HOST");
+const String? port = String.fromEnvironment("SERVER_PORT");
 
 class Api {
   static _post(String endpoint, {Map? body}) async {
