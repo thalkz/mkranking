@@ -69,7 +69,7 @@ func createPlayersTable() error {
 	CREATE TABLE IF NOT EXISTS players (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		name text NOT NULL,
-		rating double precision NOT NULL,
+		rating real NOT NULL,
 		icon integer NOT NULL,
 		races_count integer NOT NULL DEFAULT 0
 	);`
