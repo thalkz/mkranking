@@ -27,7 +27,7 @@ services:
     build:
       context: ./app
       args:
-        - SERVER_HOST=server
+        - SERVER_HOST=http://server
         - SERVER_PORT=3000
     image: thalkz/kart_app
     ports:
