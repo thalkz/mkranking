@@ -6,8 +6,8 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	"github.com/thalkz/kart/database"
-	"github.com/thalkz/kart/web"
+	"github.com/thalkz/kart/internal/database"
+	"github.com/thalkz/kart/internal/web"
 )
 
 // func appHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
