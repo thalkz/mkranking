@@ -1,6 +1,0 @@
-POST http://localhost:8080/getPlayer HTTP/1.1
-content-type: application/json
-
-{
-    "id": 20
-}

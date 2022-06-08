@@ -1,7 +1,0 @@
-POST http://localhost:8080/updatePlayer HTTP/1.1
-content-type: application/json
-
-{
-    "id": 10,
-    "name": "NewName"
-}

@@ -12,7 +12,7 @@ services:
       - data:/var/lib/postgresql/data
 
   server:
-    build: ./server
+    build: .
     image: ghcr.io/thalkz/kart_server
     restart: always
     env_file:
