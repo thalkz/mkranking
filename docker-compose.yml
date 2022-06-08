@@ -12,24 +12,13 @@ services:
       - data:/var/lib/postgresql/data
 
   server:
-    build:
-      context: ./server
-    image: thalkz/kart_server
+    build: ./server
+    image: ghcr.io/thalkz/kart_server
     restart: always
     env_file:
       - .env
     depends_on:
       - database
-    ports:
-      - "3000:3000"
-
-  app:
-    build:
-      context: ./app
-      args:
-        - SERVER_HOST=http://server
-        - SERVER_PORT=3000
-    image: thalkz/kart_app
     ports:
       - "80:80"
 

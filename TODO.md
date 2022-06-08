@@ -9,3 +9,4 @@
 - [ ] feat: Add score graphics for players
 - [ ] feat: Show number of races for each player
 - [ ] feat: Show gain/lost points after a race
+- [ ] feat: Use TLS connection for server (https)

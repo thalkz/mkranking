@@ -12,6 +12,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/thalkz/kart/api"
 	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/web"
 )
 
 func appHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
@@ -41,17 +42,22 @@ func main() {
 	router := http.NewServeMux()
 
 	// Setup routes
-	router.HandleFunc("/hello", appHandler(api.Hello))
-	router.HandleFunc("/getPlayer", appHandler(api.GetPlayer))
-	router.HandleFunc("/createPlayer", appHandler(api.CreatePlayer))
-	router.HandleFunc("/updatePlayer", appHandler(api.UpdatePlayer))
-	router.HandleFunc("/deletePlayer", appHandler(api.DeletePlayer))
-	router.HandleFunc("/submitResults", appHandler(api.SubmitResults))
-	router.HandleFunc("/getAllPlayers", appHandler(api.GetAllPlayers))
-	router.HandleFunc("/getAllRaces", appHandler(api.GetAllRaces))
-	router.HandleFunc("/getPlayerRaces", appHandler(api.GetPlayerRaces))
-	router.HandleFunc("/resetAllRatings", appHandler(api.ResetAllRatings))
-	router.HandleFunc("/getHistory", appHandler(api.GetHistory))
+	// router.HandleFunc("/hello", appHandler(api.Hello))
+	// router.HandleFunc("/getPlayer", appHandler(api.GetPlayer))
+	// router.HandleFunc("/createPlayer", appHandler(api.CreatePlayer))
+	// router.HandleFunc("/updatePlayer", appHandler(api.UpdatePlayer))
+	// router.HandleFunc("/deletePlayer", appHandler(api.DeletePlayer))
+	// router.HandleFunc("/submitResults", appHandler(api.SubmitResults))
+	// router.HandleFunc("/getAllPlayers", appHandler(api.GetAllPlayers))
+	// router.HandleFunc("/getAllRaces", appHandler(api.GetAllRaces))
+	// router.HandleFunc("/getPlayerRaces", appHandler(api.GetPlayerRaces))
+	// router.HandleFunc("/resetAllRatings", appHandler(api.ResetAllRatings))
+	// router.HandleFunc("/getHistory", appHandler(api.GetHistory))
+
+	router.HandleFunc("/test", web.Home)
+
+	fs := http.FileServer(http.Dir("static"))
+	router.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Open database
 	var cleanup, err = database.Open()

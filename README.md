@@ -33,8 +33,3 @@ The whole project can be deployed using docker-compose. The docker-compose confi
 ## License 
 
 [MIT](LICENSE)
-
-## Screenshots
-
-<img src="ranking.png" width="250"/>
-<img src="races.png" width="250"/>
