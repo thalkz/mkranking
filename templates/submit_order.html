@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+{{template "head.html"}}
+
+<body>
+  <div class="container">
+    <article>
+      <header>
+        Participants (2/2)
+      </header>
+      <form>
+        <table>
+          <tbody id="participants">
+            {{range .Players}}
+            <tr id="{{ .Id }}">
+              <th scope="row"><kbd>{{ .Rank }}</kbd></th>
+              <th><img src="static/characters/{{ .Icon }}.png" width="30" /><b>{{.Name}}</b></th>
+              <th><img src="static/svgs/caret-up-outline.svg" width="24" onclick="up('{{.Id}}');" /></th>
+              <th><img src="static/svgs/caret-down-outline.svg" width="24" onclick="down('{{ .Id }}')" /></th>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+
+      </form>
+      <button onclick="confirm();">Continuer</button>
+      <button onclick="location.href='/'" class="secondary outline">Annuler</button>
+    </article>
+  </div>
+  {{template "footer.html"}}
+
+</body>
+
+</html>
+
+<script>
+  function confirm() {
+    let table = document.getElementById("participants");
+    let ids = []
+    for (child of table.children) {
+      ids.push(child.id)
+    }
+    window.location.href = `/submit?participants=${ids.join(',')}&confirm=true`;
+  }
+
+  function up(id) {
+    const rows = getRows()
+    const row = document.getElementById(id);
+    const index = rows.indexOf(row)
+    if (index == 0) return;
+    arraymove(rows, index, index - 1)
+    updateRows(rows)
+  }
+
+  function down(id) {
+    const rows = getRows();
+    const row = document.getElementById(id);
+    const index = rows.indexOf(row)
+    if (index == rows.length - 1) return;
+    arraymove(rows, index, index + 1)
+    updateRows(rows);
+  }
+
+  function getRows() {
+    let tbody = document.getElementById("participants");
+    let children = []
+    for (child of tbody.children) {
+      children.push(child)
+    }
+    return children;
+  }
+
+  function updateRows(rows) {
+    let tbody = document.getElementById("participants");
+    for (let child of rows) {
+      tbody.appendChild(child);
+    }
+  }
+
+  function arraymove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+  }
+</script>

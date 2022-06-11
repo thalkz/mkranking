@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/thalkz/kart/internal/config"
 	"github.com/thalkz/kart/internal/models"
 )
 
@@ -18,7 +19,7 @@ func GetPlayerHistory(userId int) ([]models.HistoryEvent, error) {
 	}
 
 	history := make([]models.HistoryEvent, 0)
-	lastValidRating := 1000.0 // TODO Use initial rating config
+	lastValidRating := config.InitialRating
 	for rows.Next() {
 		var raceId int
 		var date string

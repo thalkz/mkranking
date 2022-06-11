@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+{{template "head.html"}}
+
+<body>
+  <div class="container">
+    <article>
+      <header>
+        Resultats
+      </header>
+
+      <table>
+        <tbody>
+          {{ range .Results }}
+          <tr>
+            <th scope="row"><kbd> {{ .Rank }} </kbd></th>
+            <th><img src="static/characters/{{ .Icon }}.png" width="30" /><b>{{ .Name }}</b></th>
+            <th>{{ if gt .Diff 0 }}+{{ end }}{{ .Diff }} pts</th>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+
+      <button onclick="location.href='/'" class="secondary outline">OK !</button>
+    </article>
+  </div>
+  {{template "footer.html"}}
+
+</body>
+
+</html>

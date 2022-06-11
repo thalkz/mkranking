@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/internal/database"
 )
 
 type updatePlayerRequest struct {

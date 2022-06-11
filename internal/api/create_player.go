@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/internal/config"
+	"github.com/thalkz/kart/internal/database"
 )
 
 type createPlayerRequest struct {
@@ -17,10 +18,6 @@ type createPlayerRequest struct {
 type createPlayerResponse struct {
 	Id int `json:"id"`
 }
-
-const (
-	initialRating = 1000.0
-)
 
 func CreatePlayer(w http.ResponseWriter, req *http.Request) error {
 	b, err := io.ReadAll(req.Body)
@@ -34,7 +31,7 @@ func CreatePlayer(w http.ResponseWriter, req *http.Request) error {
 	}
 	log.Printf("Creating %v\n", body.Name)
 
-	id, err := database.CreatePlayer(body.Name, initialRating, body.Icon)
+	id, err := database.CreatePlayer(body.Name, config.InitialRating, body.Icon)
 	if err != nil {
 		return err
 	}

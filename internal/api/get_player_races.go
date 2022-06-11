@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/internal/database"
 )
 
 type getPlayerRacesRequest struct {

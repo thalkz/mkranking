@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+{{template "head.html"}}
+
+<body>
+  <div class="container">
+    <article>
+      <header>
+        Nouveau joueur
+      </header>
+      <form>
+        <label for="name">
+          Ton Pseudo
+          <input type="text" id="name" name="name" placeholder="{{ .NamePlaceholder }}" required>
+        </label>
+
+        <div style="display: grid; grid-template-columns: auto auto auto;">
+          {{ range .Icons }}
+          <div>
+            <input type="radio" id="icon" name="icon" value="{{.}}">
+            <img src="static/characters/{{.}}.png" width="50" />
+          </div>
+          {{end}}
+        </div>
+        <br/>
+
+        <button type="submit">Créer</button>
+      </form>
+      <button onclick="location.href='/'" class="secondary outline">Annuler</button>
+    </article>
+  </div>
+
+  {{template "footer.html"}}
+</body>
+
+</html>

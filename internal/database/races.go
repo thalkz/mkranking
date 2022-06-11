@@ -68,7 +68,7 @@ func GetRace(id int) (models.Race, error) {
 }
 
 func GetAllRaces() ([]models.Race, error) {
-	rows, err := db.Query("SELECT * FROM races ORDER BY date")
+	rows, err := db.Query("SELECT * FROM races ORDER BY date DESC")
 	races := make([]models.Race, 0)
 	var ranking pq.Int64Array
 	for rows.Next() {

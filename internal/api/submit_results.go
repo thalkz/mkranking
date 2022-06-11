@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/thalkz/kart/database"
-	"github.com/thalkz/kart/elo"
+	"github.com/thalkz/kart/internal/database"
+	"github.com/thalkz/kart/internal/elo"
 )
 
 type submitResultsRequest struct {

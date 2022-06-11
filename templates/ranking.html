@@ -1,52 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
-
-<head>
-  <meta charset="utf-8">
-  <title>Kart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="static/css/pico.min.css">
-  <link rel="stylesheet" href="static/css/style.css">
-  <link rel="icon" type="image/png" href="static/images/favicon.png">
-</head>
+{{template "head.html"}}
 
 <body>
-  <nav class="container-fluid">
-    <ul>
-      <li><strong>Kart</strong></li>
-    </ul>
-    <ul>
-      <li><a href="/">Classement</a></li>
-      <li><a href="/races">Courses</a></li>
-      <li><a href="/stats">Stats</a></li>
-    </ul>
-  </nav>
+  {{template "nav.html"}}
 
   <main class="container">
     <hgroup>
-      <h4>Season 2</h4>
-      <p><em>Fin dans 60 days</em></p>
+      <h4>Season {{ .Season }}</h4>
+      <p><em>Fin dans {{ .DaysLeft }} jours</em></p>
     </hgroup>
     <a href="/submit" role="button">Nouvelle course</a>
     <p></p>
     <table>
       <tbody>
-        <tr onclick="location.href='/player'" style="cursor:pointer">
-          <th scope="row"><kbd>1</kbd></th>
-          <th><img src="static/characters/MK8_BabyDaisy_Icon.png" width="50" /> <b>Lucas</b></th>
-          <th><small>1000 pts<br />1 course</small></th>
+        {{ range .Players }}
+        <tr onclick="location.href='/player?id={{ .Id }}'" style="cursor:pointer">
+          <th scope="row"><kbd>{{ .Rank }}</kbd></th>
+          <th><img src="static/characters/{{ .Icon }}.png" width="30" /> <b>{{ .Name }}{{if eq .Rank 1}} 👑{{end}}</b></th>
+          <th><small>{{.Rating}} pts<br />{{ .RacesCount }} courses</small></th>
         </tr>
-        <tr onclick="location.href='/player'" style="cursor:pointer">
-          <th scope="row"><kbd>2</kbd></th>
-          <th><img src="static/characters/MK8_BabyDaisy_Icon.png" width="50" /> <b>Lucas</b></th>
-          <th><small>1000 pts<br />1 course</small></th>
-        </tr>
-        <tr onclick="location.href='/player'" style="cursor:pointer">
-          <th scope="row"><kbd>3</kbd></th>
-          <th><img src="static/characters/MK8_BabyDaisy_Icon.png" width="50" /> <b>Lucas</b></th>
-          <th><small>1000 pts<br />1 course</small></th>
-        </tr>
+        {{ end }}
       </tbody>
     </table>
     <footer>
@@ -54,11 +28,7 @@
     </footer>
   </main>
 
-  <div class="container">
-    <hr />
-    <p><small>by Roland Lamidieu • <a href="https://github.com/thalkz/kart" class="secondary"> Github</a> • <a
-          href="https://github.com/thalkz/kart/blob/main/LICENSE" class="secondary">MIT</a></small></p>
-  </div>
+  {{template "footer.html"}}
 </body>
 
 </html>

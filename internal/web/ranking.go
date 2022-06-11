@@ -1,30 +1,35 @@
 package web
 
 import (
-	"html/template"
-	"log"
+	"fmt"
 	"net/http"
+
+	"github.com/thalkz/kart/internal/database"
+	"github.com/thalkz/kart/internal/models"
 )
 
 type RankingPage struct {
-	Title string
-	Body  string
+	Season   int
+	DaysLeft int
+	Players  []models.Player
 }
 
-func RankingHandler(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/ranking.html")
+func RankingHandler(w http.ResponseWriter, r *http.Request) error {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return nil
+	}
+
+	players, err := database.GetAllPlayers()
 	if err != nil {
-		// log.Printf("parsing template failed: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return fmt.Errorf("failed to get all players: %w", err)
 	}
 
 	data := RankingPage{
-		Title: "Hello",
-		Body:  "This is the body",
+		Season:   1,
+		DaysLeft: 60,
+		Players:  players,
 	}
-	err = t.Execute(w, data)
-	if err != nil {
-		log.Printf("executing template failed: %v", err)
-	}
+	renderTemplate(w, "ranking.html", data)
+	return nil
 }

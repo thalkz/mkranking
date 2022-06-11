@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+{{template "head.html"}}
+
+<body>
+  <div class="container">
+    <article>
+      <header>
+        Bienvenue {{ .Name }}
+      </header>
+      <button onclick="location.href='/'" class="secondary outline">Continuer</button>
+    </article>
+  </div>
+
+  {{template "footer.html"}}
+</body>
+
+</html>

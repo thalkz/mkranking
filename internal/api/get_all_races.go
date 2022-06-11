@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/internal/database"
 )
 
 func GetAllRaces(w http.ResponseWriter, req *http.Request) error {
