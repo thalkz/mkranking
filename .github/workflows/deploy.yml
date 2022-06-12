@@ -27,4 +27,4 @@ jobs:
         run: |
           docker tag kart_server ghcr.io/thalkz/kart_server:${{ steps.tagName.outputs.tag }}
           docker tag kart_server ghcr.io/thalkz/kart_server:latest
-          docker push ghcr.io/thalkz/kart_server
+          docker push --all-tags ghcr.io/thalkz/kart_server
