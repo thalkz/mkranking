@@ -7,7 +7,6 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/web"
 )
 
@@ -45,19 +44,28 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Open database
-	var cleanup, err = database.Open()
-	if err != nil {
-		log.Fatalln("failed to open database:", err)
-	}
-	defer cleanup()
+	// var cleanup, err = database.Open()
+	// if err != nil {
+	// 	log.Fatalln("failed to open database:", err)
+	// }
+	// defer cleanup()
 
 	// Get port
 	httpPort := os.Getenv("SERVER_PORT")
 	if httpPort == "" {
-		httpPort = "3000"
+		httpPort = "80"
 	}
 
+	tlsKeysFolder := os.Getenv("TLS_KEYS_PATH")
+	crtFilename := os.Getenv("TLS_CRT_FILENAME")
+	keyFilename := os.Getenv("TLS_KEY_FILENAME")
+
 	// Start server
-	log.Println("Listening on port", httpPort)
-	log.Fatal(http.ListenAndServe(":"+httpPort, nil))
+	if tlsKeysFolder == "" || crtFilename == "" || keyFilename == "" {
+		log.Println("Listening on port", httpPort)
+		log.Fatal(http.ListenAndServe(":"+httpPort, nil))
+	} else {
+		log.Println("Listening HTTPS on port", httpPort)
+		log.Fatal(http.ListenAndServeTLS(":"+httpPort, tlsKeysFolder+crtFilename, tlsKeysFolder+keyFilename, nil))
+	}
 }
