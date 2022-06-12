@@ -4,10 +4,10 @@ Kart is a simple web-app to record Mario Kart races and attribute an elo score t
 
 ## How it works
 
-- Users create a character with a name, a [Mario Kart avatar](https://www.mariowiki.com/Mario_Kart_8_Deluxe), and a starting [elo score of 1000
-- Races results are entered in a few clics (only the real players are taken into account, bots are ignored)
-- After each race, players will earn or loose elo points, based on their result in the race
-- The ranking is updated after each race. More elo points = better ranking.
+* Users create a character with a name, a [Mario Kart avatar](https://www.mariowiki.com/Mario_Kart_8_Deluxe), and a starting [elo score of 1000
+* Races results are entered in a few clics (only the real players are taken into account, bots are ignored)
+* After each race, players will earn or loose elo points, based on their result in the race
+* The ranking is updated after each race. More elo points = better ranking.
 
 ## Ranking & score
 
@@ -15,21 +15,19 @@ Kart uses the [Elo rating system](https://en.wikipedia.org/wiki/Elo_rating_syste
 
 Elo usually only works for two player games (1 vs 1), but [this article](https://towardsdatascience.com/developing-a-generalized-elo-rating-system-for-multiplayer-games-b9b495e87802) show how to generalize this system for multiplayer games, with an arbitrary number of participants for each match.
 
-## Project structure
+## Project stack
 
-This project has 3 main parts :
-- `app`, a Flutter app that can be compiled to an Android or iOS app, but also as a web-app
-- `server`, the backend for this project, written in Go
-- `reverse_proxy` that contains Nginx configs for handeling incomming requests to the server
+* The webserver is written in Go, and uses [pico.css](https://picocss.com/) for styling
+* The databse is PostgreSQL
 
 The whole project can be deployed using docker-compose. The docker-compose config also starts a Posgresql database, using the official Postgres image.
 
 ## How to use
 
-- Clone the project
-- Create a `.env` file at the root of the project based on the `.env-example` file, with your configs
-- Deploy using `docker-compose build` and `docker-compose up`
+* Clone the project
+* Create a `.env` file at the root of the project based on the `.env-example` file, with your configs
+* Deploy using `docker-compose up --build`
 
-## License 
+## License
 
 [MIT](LICENSE)
