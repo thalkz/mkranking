@@ -73,7 +73,8 @@ func createPlayersTable() error {
 		name text NOT NULL,
 		rating real NOT NULL,
 		icon integer NOT NULL,
-		races_count integer NOT NULL DEFAULT 0
+		races_count integer NOT NULL DEFAULT 0,
+		season integer NOT NULL DEFAULT 1
 	);`
 	_, err := db.Exec(statement)
 	return err
@@ -84,7 +85,8 @@ func createRacesTable() error {
 	CREATE TABLE IF NOT EXISTS races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		ranking integer[] NOT NULL,
-		date timestamp without time zone NOT NULL
+		date timestamp without time zone NOT NULL,
+		season integer NOT NULL DEFAULT 1
 	);`
 	_, err := db.Exec(statement)
 	return err

@@ -23,12 +23,12 @@ func RankingHandler(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	rankedPlayers, err := database.GetRankedPlayers(config.MinRacesCount)
+	rankedPlayers, err := database.GetRankedPlayers(config.Season, config.MinRacesCount)
 	if err != nil {
 		return fmt.Errorf("failed to get ranked players: %w", err)
 	}
 
-	unrankedPlayers, err := database.GetUnrankedPlayers(config.MinRacesCount)
+	unrankedPlayers, err := database.GetUnrankedPlayers(config.Season, config.MinRacesCount)
 	if err != nil {
 		return fmt.Errorf("failed to get unranked players: %w", err)
 	}

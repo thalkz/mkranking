@@ -7,8 +7,8 @@ import (
 	"github.com/thalkz/kart/models"
 )
 
-func CreatePlayer(name string, rating float64, icon int) (int, error) {
-	row := db.QueryRow("INSERT INTO players (name, rating, icon) VALUES ($1, $2, $3) RETURNING id", name, rating, icon)
+func CreatePlayer(name string, rating float64, icon int, season int) (int, error) {
+	row := db.QueryRow("INSERT INTO players (name, rating, icon, season) VALUES ($1, $2, $3, $4) RETURNING id", name, rating, icon, season)
 	var id int
 	err := row.Scan(&id)
 	return id, err
@@ -87,8 +87,8 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 	return orderedPlayers, err
 }
 
-func GetAllPlayers() ([]models.Player, error) {
-	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players")
+func GetAllPlayers(season int) ([]models.Player, error) {
+	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE season = $1", season)
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
@@ -101,8 +101,10 @@ func GetAllPlayers() ([]models.Player, error) {
 	return players, err
 }
 
-func GetRankedPlayers(minRaces int) ([]models.Player, error) {
-	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE races_count >= $1", minRaces)
+func GetRankedPlayers(season int, minRaces int) ([]models.Player, error) {
+	rows, err := db.Query(`SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank 
+		FROM players 
+		WHERE season = $1 AND races_count >= $2`, season, minRaces)
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player
@@ -115,8 +117,10 @@ func GetRankedPlayers(minRaces int) ([]models.Player, error) {
 	return players, err
 }
 
-func GetUnrankedPlayers(minRaces int) ([]models.Player, error) {
-	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE races_count < $1", minRaces)
+func GetUnrankedPlayers(season int, minRaces int) ([]models.Player, error) {
+	rows, err := db.Query(`SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank 
+		FROM players 
+		WHERE season = $1 AND races_count < $2`, season, minRaces)
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player

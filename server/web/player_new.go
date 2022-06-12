@@ -31,7 +31,7 @@ func createPlayerHandler(w http.ResponseWriter, r *http.Request, name string, ic
 		return fmt.Errorf("failed to parse icon: %w", err)
 	}
 
-	id, err := database.CreatePlayer(name, config.InitialRating, icon)
+	id, err := database.CreatePlayer(name, config.InitialRating, icon, config.Season)
 	if err != nil {
 		return fmt.Errorf("failed to create user %v: %w", name, err)
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 // ranking is a list of playerIds, sorted by race position
-func CreateRace(ranking []int, oldRatings, newRatings []float64) (int, error) {
+func CreateRace(ranking []int, oldRatings, newRatings []float64, season int) (int, error) {
 	tx, err := db.Begin()
 	defer tx.Rollback()
 	if err != nil {
@@ -18,7 +18,7 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) (int, error) {
 
 	// Insert race
 	now := time.Now().Format("2006-01-02 15:04:05")
-	row := tx.QueryRow("INSERT INTO races (ranking, date) VALUES ($1, $2) RETURNING id", pq.Array(ranking), now)
+	row := tx.QueryRow("INSERT INTO races (ranking, date, season) VALUES ($1, $2, $3) RETURNING id", pq.Array(ranking), now, season)
 	var raceId int
 	if err = row.Scan(&raceId); err != nil {
 		return 0, fmt.Errorf("failed to insert into races: %w", err)
@@ -96,8 +96,8 @@ func GetRaceDetails(id int) (*models.RaceDetails, error) {
 	}, nil
 }
 
-func GetAllRaces() ([]models.Race, error) {
-	rows, err := db.Query("SELECT id, ranking, date FROM races ORDER BY date DESC")
+func GetAllRaces(season int) ([]models.Race, error) {
+	rows, err := db.Query("SELECT id, ranking, date FROM races WHERE season = $1 ORDER BY date DESC", season)
 	races := make([]models.Race, 0)
 	var ranking pq.Int64Array
 	for rows.Next() {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/elo"
 	"github.com/thalkz/kart/models"
@@ -28,7 +29,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) error {
 }
 
 func selectParticipantsHandler(w http.ResponseWriter, r *http.Request) error {
-	players, err := database.GetAllPlayers()
+	players, err := database.GetAllPlayers(config.Season)
 	if err != nil {
 		return fmt.Errorf("failed to get all players: %w", err)
 	}
@@ -58,7 +59,7 @@ func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
 
 	newRatings := elo.ComputeRatings(oldRatings)
 
-	raceId, err := database.CreateRace(ids, oldRatings, newRatings)
+	raceId, err := database.CreateRace(ids, oldRatings, newRatings, config.Season)
 	if err != nil {
 		return fmt.Errorf("failed creating race: %w", err)
 	}
