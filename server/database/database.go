@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/thalkz/kart/internal/config"
+	"github.com/thalkz/kart/config"
 )
 
 var (

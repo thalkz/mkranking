@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/thalkz/kart/internal/config"
-	"github.com/thalkz/kart/internal/database"
-	"github.com/thalkz/kart/internal/models"
+	"github.com/thalkz/kart/config"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/models"
 )
 
 type RankingPage struct {

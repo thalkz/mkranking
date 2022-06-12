@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/thalkz/kart/internal/database"
-	"github.com/thalkz/kart/internal/elo"
-	"github.com/thalkz/kart/internal/models"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/elo"
+	"github.com/thalkz/kart/models"
 )
 
 type participantsPage struct {

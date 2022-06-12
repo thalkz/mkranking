@@ -7,11 +7,11 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/thalkz/kart/internal/database"
-	"github.com/thalkz/kart/internal/web"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/web"
 )
 
-func appHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+func makeHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		err := fn(w, r)
@@ -31,14 +31,14 @@ func appHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerF
 
 func main() {
 	// Serve routes
-	http.HandleFunc("/player", appHandler(web.PlayerHandler))
-	http.HandleFunc("/results", appHandler(web.ResultsPageHandler))
-	http.HandleFunc("/submit", appHandler(web.SubmitHandler))
-	http.HandleFunc("/new", appHandler(web.NewPlayerHandler))
-	http.HandleFunc("/welcome", appHandler(web.WelcomePlayerPage))
-	http.HandleFunc("/races", appHandler(web.RacesHandler))
-	http.HandleFunc("/stats", appHandler(web.StatsHandler))
-	http.HandleFunc("/", appHandler(web.RankingHandler))
+	http.HandleFunc("/player", makeHandler(web.PlayerHandler))
+	http.HandleFunc("/results", makeHandler(web.ResultsPageHandler))
+	http.HandleFunc("/submit", makeHandler(web.SubmitHandler))
+	http.HandleFunc("/new", makeHandler(web.NewPlayerHandler))
+	http.HandleFunc("/welcome", makeHandler(web.WelcomePlayerPage))
+	http.HandleFunc("/races", makeHandler(web.RacesHandler))
+	http.HandleFunc("/stats", makeHandler(web.StatsHandler))
+	http.HandleFunc("/", makeHandler(web.RankingHandler))
 
 	// Serve static files
 	fs := http.FileServer(http.Dir("static"))

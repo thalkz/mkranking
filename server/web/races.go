@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/thalkz/kart/internal/database"
-	"github.com/thalkz/kart/internal/models"
+	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/models"
 )
 
 type racesPage struct {

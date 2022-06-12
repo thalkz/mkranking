@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/thalkz/kart/internal/config"
-	"github.com/thalkz/kart/internal/database"
+	"github.com/thalkz/kart/config"
+	"github.com/thalkz/kart/database"
 )
 
 type chooseNameAndIconPage struct {

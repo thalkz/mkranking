@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/thalkz/kart/internal/config"
-	"github.com/thalkz/kart/internal/models"
+	"github.com/thalkz/kart/config"
+	"github.com/thalkz/kart/models"
 )
 
 func GetPlayerHistory(userId int) ([]models.HistoryEvent, error) {

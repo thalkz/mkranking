@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/thalkz/kart/internal/models"
+	"github.com/thalkz/kart/models"
 )
 
 // ranking is a list of playerIds, sorted by race position

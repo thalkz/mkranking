@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/thalkz/kart/internal/database"
+	"github.com/thalkz/kart/database"
 )
 
 func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
