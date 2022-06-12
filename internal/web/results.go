@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/thalkz/kart/internal/database"
 )
@@ -13,45 +14,32 @@ type resultsPage struct {
 
 type result struct {
 	Rank int
+	Id   int
 	Name string
 	Icon int
 	Diff int
 }
 
 func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
-	participantsStr := r.FormValue("participants")
-	diffStr := r.FormValue("diff")
-
-	if diffStr == "" || participantsStr == "" {
-		return fmt.Errorf("expected diff and participants params")
-	}
-
-	playerIds, err := parseIntList(participantsStr)
+	raceIdStr := r.FormValue("race_id")
+	raceId, err := strconv.Atoi(raceIdStr)
 	if err != nil {
-		return fmt.Errorf("failed to parse participants: %w", err)
+		return fmt.Errorf("failed to parse key %v: %w", raceIdStr, err)
 	}
 
-	diffs, err := parseIntList(diffStr)
+	race, err := database.GetRace(raceId)
 	if err != nil {
-		return fmt.Errorf("failed to parse diffs: %w", err)
+		return fmt.Errorf("failed to get race: %w", err)
 	}
 
-	if len(playerIds) != len(diffs) {
-		return fmt.Errorf("expected diff and participants to have the same length")
-	}
-
-	players, err := database.GetPlayers(playerIds)
-	if err != nil {
-		return fmt.Errorf("failed to get players: %w", err)
-	}
-
-	results := make([]result, len(players))
-	for i := range players {
+	results := make([]result, len(race.Results))
+	for i, playerId := range race.Results {
 		results[i] = result{
 			Rank: i + 1,
-			Name: players[i].Name,
-			Icon: players[i].Icon,
-			Diff: diffs[i],
+			Id:   playerId,
+			Name: "??",
+			Icon: 0,
+			Diff: 0,
 		}
 	}
 

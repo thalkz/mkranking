@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+{{template "head.html"}}
+
+<body>
+  <div class="container">
+    <article>
+      <header>
+        Participants
+      </header>
+      <form>
+        <fieldset>
+
+          <label for="first">1er</label>
+          <select id="first" name="first" required>
+            <option value="">--Selectionner un joueur--</option>
+            {{range .Players}}
+            <option value="{{ .Id }}">{{ .Name }}</option>
+            {{end}}
+          </select>
+
+          <label for="second">2eme</label>
+          <select id="second" name="second" required>
+            <option value="">--Selectionner un joueur--</option>
+            {{range .Players}}
+            <option value="{{ .Id }}">{{ .Name }}</option>
+            {{end}}
+          </select>
+
+          <label for="third">3eme</label>
+          <select id="third" name="third">
+            <option value="">--Selectionner un joueur--</option>
+            {{range .Players}}
+            <option value="{{ .Id }}">{{ .Name }}</option>
+            {{end}}
+          </select>
+
+          <label for="fourth">4eme</label>
+          <select id="fourth" name="fourth">
+            <option value="">--Selectionner un joueur--</option>
+            {{range .Players}}
+            <option value="{{ .Id }}">{{ .Name }}</option>
+            {{end}}
+          </select>
+        </fieldset>
+        <button type="submit">Valider</button>
+      </form>
+      <button onclick="location.href='/'" class="secondary outline">Annuler</button>
+    </article>
+  </div>
+  {{template "footer.html"}}
+
+</body>
+
+</html>

@@ -70,6 +70,10 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 		players = append(players, player)
 	}
 
+	if len(playerIds) != len(players) {
+		return nil, fmt.Errorf("returned players does not have same length: expected %v, got %v", len(playerIds), len(players))
+	}
+
 	// Order players based on input `playerIds` parameter
 	orderedPlayers := make([]models.Player, len(players))
 	for i, playerId := range playerIds {

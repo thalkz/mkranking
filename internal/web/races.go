@@ -40,7 +40,7 @@ func RacesHandler(w http.ResponseWriter, r *http.Request) error {
 	now := time.Now().Unix()
 
 	for i, race := range races {
-		var racePlayers = make([]models.Player, len(race.Results))
+		var racePlayers = make([]models.Player, 4)
 		for i, playerId := range race.Results {
 			value, ok := playersMap[playerId]
 			if ok {
@@ -57,15 +57,15 @@ func RacesHandler(w http.ResponseWriter, r *http.Request) error {
 			return fmt.Errorf("failed to parse race date: %w", err)
 		}
 
-		second := now - date.Unix()
-		hours := int(second / 3600)
+		seconds := now - date.Unix()
+		hours := int(seconds / 3600)
 		days := int(hours / 24)
 
 		var dateStr string
 		if days > 0 {
 			dateStr = fmt.Sprintf("%v jours", days)
 		} else if hours > 0 {
-			dateStr = fmt.Sprintf("%v heures", days)
+			dateStr = fmt.Sprintf("%v heures", hours)
 		} else {
 			dateStr = "à l'instant"
 		}

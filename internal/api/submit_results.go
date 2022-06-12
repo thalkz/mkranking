@@ -51,7 +51,7 @@ func SubmitResults(w http.ResponseWriter, req *http.Request) error {
 	log.Printf("New ratings are %v\n", newRatings)
 
 	log.Printf("Creating race with ranking: %v\n", body.Ranking)
-	if err := database.CreateRace(body.Ranking, oldRatings, newRatings); err != nil {
+	if _, err := database.CreateRace(body.Ranking, oldRatings, newRatings); err != nil {
 		return fmt.Errorf("failed creating race: %w", err)
 	}
 

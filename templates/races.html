@@ -9,25 +9,27 @@
     <table>
       <thead>
         <tr>
-          <th scope="col">Date</th>
           <th scope="col">1er</th>
           <th scope="col">2eme</th>
           <th scope="col">3eme</th>
           <th scope="col">4eme</th>
+          <th scope="col">Date</th>
         </tr>
       </thead>
       <tbody>
         {{range .Races}}
         <tr>
-          <td scope="row">{{ .Date }}</td>
           {{range .Players}}
           <td scope="row">
+            {{if .Name}}
             <figure>
               <img src="static/characters/{{.Icon}}.png" width="30" alt="{{ .Name }}">
               <figcaption><b>{{ .Name }}</b></figcaption>
             </figure>
+            {{end}}
           </td>
           {{end}}
+          <td scope="row">{{ .Date }}</td>
         </tr>
         {{end}}
       </tbody>

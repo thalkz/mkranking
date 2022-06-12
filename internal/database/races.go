@@ -9,11 +9,11 @@ import (
 )
 
 // ranking is a list of playerIds, sorted by race position
-func CreateRace(ranking []int, oldRatings, newRatings []float64) error {
+func CreateRace(ranking []int, oldRatings, newRatings []float64) (int, error) {
 	tx, err := db.Begin()
 	defer tx.Rollback()
 	if err != nil {
-		return fmt.Errorf("failed to begin tx: %w", err)
+		return 0, fmt.Errorf("failed to begin tx: %w", err)
 	}
 
 	// Insert race
@@ -21,7 +21,7 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) error {
 	row := tx.QueryRow("INSERT INTO races (ranking, date) VALUES ($1, $2) RETURNING id", pq.Array(ranking), now)
 	var raceId int
 	if err = row.Scan(&raceId); err != nil {
-		return fmt.Errorf("failed to insert into races: %w", err)
+		return 0, fmt.Errorf("failed to insert into races: %w", err)
 	}
 
 	// Insert players_races
@@ -37,7 +37,7 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) error {
 			newRatings[i]-oldRatings[i],
 		)
 		if err != nil {
-			return fmt.Errorf("failed to insert %v into players_races: %w", userId, err)
+			return 0, fmt.Errorf("failed to insert %v into players_races: %w", userId, err)
 		}
 	}
 
@@ -45,15 +45,15 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) error {
 	for i, userId := range ranking {
 		_, err := db.Exec("UPDATE players SET rating = $1, races_count = races_count + 1 WHERE id = $2", newRatings[i], userId)
 		if err != nil {
-			return fmt.Errorf("failed to update player %v: %w", userId, err)
+			return 0, fmt.Errorf("failed to update player %v: %w", userId, err)
 		}
 	}
 
 	// Commit transaction
 	if err = tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit tx: %w", err)
+		return 0, fmt.Errorf("failed to commit tx: %w", err)
 	}
-	return nil
+	return raceId, nil
 }
 
 func GetRace(id int) (models.Race, error) {

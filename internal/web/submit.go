@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/thalkz/kart/internal/database"
 	"github.com/thalkz/kart/internal/elo"
@@ -16,14 +15,13 @@ type participantsPage struct {
 	Players []models.Player
 }
 
-func SubmitHandler(w http.ResponseWriter, r *http.Request) error {
-	participants := r.FormValue("participants")
-	confirm := r.FormValue("confirm")
+const NO_PLAYER_ID = -1
 
-	if confirm == "true" {
-		return createRaceHandler(w, r, participants)
-	} else if participants != "" {
-		return orderParticipantsHandler(w, r, participants)
+func SubmitHandler(w http.ResponseWriter, r *http.Request) error {
+	first := r.FormValue("first")
+
+	if first != "" {
+		return createRaceHandler(w, r)
 	} else {
 		return selectParticipantsHandler(w, r)
 	}
@@ -38,36 +36,14 @@ func selectParticipantsHandler(w http.ResponseWriter, r *http.Request) error {
 	data := participantsPage{
 		Players: players,
 	}
-	renderTemplate(w, "submit_select.html", data)
+	renderTemplate(w, "submit.html", data)
 	return nil
 }
 
-func orderParticipantsHandler(w http.ResponseWriter, r *http.Request, participants string) error {
-	ids, err := parseIntList(participants)
+func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
+	ids, err := parseParticipantsKeys(r)
 	if err != nil {
 		return fmt.Errorf("failed to parse participants: %w", err)
-	}
-
-	players, err := database.GetPlayers(ids)
-	if err != nil {
-		return fmt.Errorf("failed to get players: %w", err)
-	}
-
-	data := participantsPage{
-		Players: players,
-	}
-	renderTemplate(w, "submit_order.html", data)
-	return nil
-}
-
-func createRaceHandler(w http.ResponseWriter, r *http.Request, participants string) error {
-	ids, err := parseIntList(participants)
-	if err != nil {
-		return fmt.Errorf("failed to parse participants: %w", err)
-	}
-
-	if len(ids) < 2 {
-		return fmt.Errorf("cannot submit results with less than two players. recieved %v", ids)
 	}
 
 	players, err := database.GetPlayers(ids)
@@ -82,18 +58,59 @@ func createRaceHandler(w http.ResponseWriter, r *http.Request, participants stri
 
 	newRatings := elo.ComputeRatings(oldRatings)
 
-	if err := database.CreateRace(ids, oldRatings, newRatings); err != nil {
+	raceId, err := database.CreateRace(ids, oldRatings, newRatings)
+	if err != nil {
 		return fmt.Errorf("failed creating race: %w", err)
 	}
-	log.Printf("Created race with participants: %v. Updated ratings to %v\n", ids, newRatings)
+	log.Printf("Created race with participants %v\n", ids)
+	log.Printf("Updated ratings to %v\n", newRatings)
 
-	var ratingDiff = make([]string, len(newRatings))
-	for i := range players {
-		ratingDiff[i] = strconv.Itoa(int(newRatings[i] - oldRatings[i]))
-	}
-	diff := strings.Join(ratingDiff, ",")
-
-	http.Redirect(w, r, fmt.Sprintf("/results?participants=%v&diff=%v", participants, diff), http.StatusFound)
+	endpoint := fmt.Sprintf("/results?race_id=%v", raceId)
+	http.Redirect(w, r, endpoint, http.StatusFound)
 
 	return nil
+}
+
+func parseParticipantsKeys(r *http.Request) ([]int, error) {
+	ids := make([]int, 0)
+	ids, err := appendParticipantKey(ids, r, "first", true)
+	if err != nil {
+		return nil, fmt.Errorf("failed to append first key: %w", err)
+	}
+
+	ids, err = appendParticipantKey(ids, r, "second", true)
+	if err != nil {
+		return nil, fmt.Errorf("failed to append second key: %w", err)
+	}
+
+	ids, err = appendParticipantKey(ids, r, "third", false)
+	if err != nil {
+		return nil, fmt.Errorf("failed to append third key: %w", err)
+	}
+
+	ids, err = appendParticipantKey(ids, r, "fourth", false)
+	if err != nil {
+		return nil, fmt.Errorf("failed to append fourth key: %w", err)
+	}
+	return ids, nil
+}
+
+func appendParticipantKey(ids []int, r *http.Request, key string, isRequired bool) ([]int, error) {
+	valueStr := r.FormValue(key)
+	if valueStr == "" {
+		if isRequired {
+			return nil, fmt.Errorf("required key is empty: %v", key)
+		}
+		return ids, nil
+	}
+	value, err := strconv.Atoi(valueStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse key %v: %w", key, err)
+	}
+	for _, id := range ids {
+		if id == value {
+			return nil, fmt.Errorf("participant %v already exists in %v", value, ids)
+		}
+	}
+	return append(ids, value), nil
 }
