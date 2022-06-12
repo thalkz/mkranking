@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/thalkz/kart/internal/config"
 	"github.com/thalkz/kart/internal/database"
 	"github.com/thalkz/kart/internal/models"
 )
 
 type RankingPage struct {
-	Season   int
-	DaysLeft int
-	Players  []models.Player
+	Season             int
+	TimeUntilSeasonEnd string
+	MinRacesCount      int
+	RankedPlayers      []models.Player
+	UnrankedPlayers    []models.Player
 }
 
 func RankingHandler(w http.ResponseWriter, r *http.Request) error {
@@ -20,15 +23,27 @@ func RankingHandler(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	players, err := database.GetAllPlayers()
+	rankedPlayers, err := database.GetRankedPlayers(config.MinRacesCount)
 	if err != nil {
-		return fmt.Errorf("failed to get all players: %w", err)
+		return fmt.Errorf("failed to get ranked players: %w", err)
+	}
+
+	unrankedPlayers, err := database.GetUnrankedPlayers(config.MinRacesCount)
+	if err != nil {
+		return fmt.Errorf("failed to get unranked players: %w", err)
+	}
+
+	timeUntil, err := parseTimeUntil("2006-01-02", config.SeasonEndDate)
+	if err != nil {
+		return fmt.Errorf("failed to parse timeuntil: %w", err)
 	}
 
 	data := RankingPage{
-		Season:   1,
-		DaysLeft: 60,
-		Players:  players,
+		Season:             config.Season,
+		TimeUntilSeasonEnd: timeUntil,
+		MinRacesCount:      config.MinRacesCount,
+		RankedPlayers:      rankedPlayers,
+		UnrankedPlayers:    unrankedPlayers,
 	}
 	renderTemplate(w, "ranking.html", data)
 	return nil

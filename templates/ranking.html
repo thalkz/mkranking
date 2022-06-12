@@ -7,18 +7,34 @@
 
   <main class="container">
     <hgroup>
-      <h4>Season {{ .Season }}</h4>
-      <p><em>Fin dans {{ .DaysLeft }} jours</em></p>
+      <h4>Ranking Season {{ .Season }}</h4>
+      <p><em>Fin dans {{ .TimeUntilSeasonEnd }}</em></p>
     </hgroup>
     <a href="/submit" role="button">Nouvelle course</a>
     <p></p>
     <table>
       <tbody>
-        {{ range .Players }}
+        {{ range .RankedPlayers }}
         <tr onclick="location.href='/player?id={{ .Id }}'" style="cursor:pointer">
-          <th scope="row"><kbd>{{ .Rank }}</kbd></th>
-          <th><img src="static/characters/{{ .Icon }}.png" width="30" /> <b>{{ .Name }}{{if eq .Rank 1}} 👑{{end}}</b></th>
-          <th><small>{{.Rating}} pts<br />{{ .RacesCount }} courses</small></th>
+          <th scope="row"><b>{{ .Rank }}</b></th>
+          <th><img src="static/characters/{{ .Icon }}.png" width="30" /> {{ .Name }}{{if eq .Rank 1}} 👑{{end}}</th>
+          <th><kbd>{{.Rating}} pts</mark></kbd><br />{{ .RacesCount }} courses</small></th>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+
+    <hgroup>
+      <h5>Joueurs non-classés</h5>
+      <p><em>Minimum {{ .MinRacesCount }} courses pour être classé</em></p>
+    </hgroup>
+    <table>
+      <tbody>
+        {{ range .UnrankedPlayers }}
+        <tr onclick="location.href='/player?id={{ .Id }}'" style="cursor:pointer">
+          <th scope="row">—</th>
+          <th><img src="static/characters/{{ .Icon }}.png" width="30" /> {{ .Name }}{{if eq .Rank 1}} 👑{{end}}</th>
+          <th><kbd>{{.Rating}} pts</mark></kbd><br />{{ .RacesCount }} courses</small></th>
         </tr>
         {{ end }}
       </tbody>

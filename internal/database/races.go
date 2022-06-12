@@ -57,7 +57,7 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64) (int, error) {
 }
 
 func GetRace(id int) (models.Race, error) {
-	row := db.QueryRow("SELECT * FROM races WHERE id = $1", id)
+	row := db.QueryRow(`SELECT id, ranking, date FROM races WHERE races.id = $1`, id)
 	var race models.Race
 	var ranking pq.Int64Array
 	err := row.Scan(&race.Id, &ranking, &race.Date)
@@ -67,8 +67,37 @@ func GetRace(id int) (models.Race, error) {
 	return race, err
 }
 
+func GetRaceDetails(id int) (*models.RaceDetails, error) {
+	race, err := GetRace(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get race: %w", err)
+	}
+	rows, err := db.Query(`SELECT players_races.user_id, players.name, players.icon, players_races.new_rating, players_races.rating_diff, RANK() OVER (ORDER BY players_races.id)
+		FROM races 
+			JOIN players_races ON players_races.race_id = races.id 
+			JOIN players ON players.id = players_races.user_id
+		WHERE races.id = $1
+		ORDER BY players_races.id`, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query race details: %w", err)
+	}
+	results := make([]models.RaceDetailsResult, 0)
+	for rows.Next() {
+		var result models.RaceDetailsResult
+		err = rows.Scan(&result.UserId, &result.Name, &result.Icon, &result.NewRating, &result.RatingDiff, &result.RaceRank)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		results = append(results, result)
+	}
+	return &models.RaceDetails{
+		Race:    race,
+		Results: results,
+	}, nil
+}
+
 func GetAllRaces() ([]models.Race, error) {
-	rows, err := db.Query("SELECT * FROM races ORDER BY date DESC")
+	rows, err := db.Query("SELECT id, ranking, date FROM races ORDER BY date DESC")
 	races := make([]models.Race, 0)
 	var ranking pq.Int64Array
 	for rows.Next() {

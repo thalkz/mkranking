@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/thalkz/kart/internal/database"
 	"github.com/thalkz/kart/internal/models"
@@ -37,8 +36,6 @@ func RacesHandler(w http.ResponseWriter, r *http.Request) error {
 
 	racesWithPlayers := make([]raceWithPlayers, len(races))
 
-	now := time.Now().Unix()
-
 	for i, race := range races {
 		var racePlayers = make([]models.Player, 4)
 		for i, playerId := range race.Results {
@@ -52,27 +49,14 @@ func RacesHandler(w http.ResponseWriter, r *http.Request) error {
 			}
 		}
 
-		date, err := time.Parse("2006-01-02T15:04:05Z", race.Date)
+		timeago, err := parseTimeAgo("2006-01-02T15:04:05Z", race.Date)
 		if err != nil {
-			return fmt.Errorf("failed to parse race date: %w", err)
-		}
-
-		seconds := now - date.Unix()
-		hours := int(seconds / 3600)
-		days := int(hours / 24)
-
-		var dateStr string
-		if days > 0 {
-			dateStr = fmt.Sprintf("%v jours", days)
-		} else if hours > 0 {
-			dateStr = fmt.Sprintf("%v heures", hours)
-		} else {
-			dateStr = "à l'instant"
+			return fmt.Errorf("failed to parse timeago: %w", err)
 		}
 
 		racesWithPlayers[i] = raceWithPlayers{
 			Id:      race.Id,
-			Date:    dateStr,
+			Date:    timeago,
 			Players: racePlayers,
 		}
 	}

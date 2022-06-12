@@ -14,15 +14,20 @@
         <tbody>
           {{ range .Results }}
           <tr>
-            <th scope="row"><kbd> {{ .Rank }} </kbd></th>
+            <th scope="row"><b>{{ .RaceRank }}</b></th>
             <th><img src="static/characters/{{ .Icon }}.png" width="30" /><b>{{ .Name }}</b></th>
-            <th>{{ if gt .Diff 0 }}+{{ end }}{{ .Diff }} pts</th>
+            {{ if gt .RatingDiff 0.0 }}
+            <th><kbd style="background: green;">+{{ .RatingDiff }} pts</kdb>
+            </th>
+            {{ else }}
+            <th><kbd style="background: red;">{{ .RatingDiff }} pts</kbd></th>
+            {{ end }}
           </tr>
           {{ end }}
         </tbody>
       </table>
 
-      <button onclick="location.href='/'" class="secondary outline">OK !</button>
+      <button onclick="location.href='/races'" class="secondary outline">OK !</button>
     </article>
   </div>
   {{template "footer.html"}}

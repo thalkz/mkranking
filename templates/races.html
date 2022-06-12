@@ -18,14 +18,11 @@
       </thead>
       <tbody>
         {{range .Races}}
-        <tr>
+        <tr onclick="location.href='/results?race_id={{ .Id }}'" style="cursor:pointer">
           {{range .Players}}
           <td scope="row">
             {{if .Name}}
-            <figure>
-              <img src="static/characters/{{.Icon}}.png" width="30" alt="{{ .Name }}">
-              <figcaption><b>{{ .Name }}</b></figcaption>
-            </figure>
+            <img src="static/characters/{{.Icon}}.png" width="30" alt="{{ .Name }}"> {{ .Name }}
             {{end}}
           </td>
           {{end}}

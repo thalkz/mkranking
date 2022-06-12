@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/thalkz/kart/internal/config"
 )
 
 var (
@@ -94,10 +96,10 @@ func createPlayersRacesTable() error {
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		user_id integer NOT NULL REFERENCES players(id) ON DELETE CASCADE ON UPDATE CASCADE,
 		race_id integer NOT NULL REFERENCES races(id) ON DELETE CASCADE ON UPDATE CASCADE,
-		old_rating real NOT NULL DEFAULT 1000,
-		new_rating real NOT NULL DEFAULT 1000,
+		old_rating real NOT NULL DEFAULT %v,
+		new_rating real NOT NULL DEFAULT %v,
 		rating_diff real NOT NULL DEFAULT 0
 	);`
-	_, err := db.Exec(statement)
+	_, err := db.Exec(fmt.Sprintf(statement, config.InitialRating, config.InitialRating))
 	return err
 }
