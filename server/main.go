@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/web"
 )
 
@@ -44,11 +45,11 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Open database
-	// var cleanup, err = database.Open()
-	// if err != nil {
-	// 	log.Fatalln("failed to open database:", err)
-	// }
-	// defer cleanup()
+	var cleanup, err = database.Open()
+	if err != nil {
+		log.Fatalln("failed to open database:", err)
+	}
+	defer cleanup()
 
 	// Get port
 	httpPort := os.Getenv("SERVER_PORT")

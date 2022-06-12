@@ -21,6 +21,8 @@ services:
       - database
     ports:
       - "$SERVER_PORT:$SERVER_PORT"
+    volumes:
+      - /path/to/keys/:$TLS_KEYS_PATH:ro
 
 volumes:
   data:
