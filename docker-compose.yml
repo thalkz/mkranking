@@ -20,9 +20,8 @@ services:
     depends_on:
       - database
     ports:
+      - "80:80" # For redirection to https
       - "$SERVER_PORT:$SERVER_PORT"
-    volumes:
-      - /path/to/keys/:$TLS_KEYS_PATH:ro
 
 volumes:
   data:

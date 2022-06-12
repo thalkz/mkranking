@@ -29,6 +29,12 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request) error) http.Handler
 	}
 }
 
+func redirect(w http.ResponseWriter, req *http.Request) {
+	http.Redirect(w, req,
+		"https://"+req.Host+req.URL.String(),
+		http.StatusMovedPermanently)
+}
+
 func main() {
 	// Serve routes
 	http.HandleFunc("/player", makeHandler(web.PlayerHandler))
@@ -66,6 +72,7 @@ func main() {
 		log.Println("Listening on port", httpPort)
 		log.Fatal(http.ListenAndServe(":"+httpPort, nil))
 	} else {
+		go http.ListenAndServe(":80", http.HandlerFunc(redirect))
 		log.Println("Listening HTTPS on port", httpPort)
 		log.Fatal(http.ListenAndServeTLS(":"+httpPort, tlsKeysFolder+crtFilename, tlsKeysFolder+keyFilename, nil))
 	}
