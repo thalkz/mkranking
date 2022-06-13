@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
 )
@@ -20,12 +19,14 @@ type raceWithPlayers struct {
 }
 
 func RacesHandler(w http.ResponseWriter, r *http.Request) error {
-	races, err := database.GetAllRaces(config.Season)
+	season := parseSeason(r)
+
+	races, err := database.GetAllRaces(season)
 	if err != nil {
 		return fmt.Errorf("failed to get all races: %w", err)
 	}
 
-	players, err := database.GetAllPlayers(config.Season)
+	players, err := database.GetAllPlayers(season)
 	if err != nil {
 		return fmt.Errorf("failed to get all players: %w", err)
 	}
