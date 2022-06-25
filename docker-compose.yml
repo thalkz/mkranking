@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     env_file:
-      - .env
+      - .env-local
     ports:
       - "$POSTGRES_PORT:$POSTGRES_PORT"
     volumes:
@@ -16,12 +16,14 @@ services:
     image: ghcr.io/thalkz/kart_server
     restart: always
     env_file:
-      - .env
+      - .env-local
     depends_on:
       - database
     ports:
-      - "80:80" # For redirection to https
       - "$SERVER_PORT:$SERVER_PORT"
+      - "80:80" # For redirection to https
+    volumes:
+      - /etc/letsencrypt/:/etc/letsencrypt/:ro
 
 volumes:
   data:
