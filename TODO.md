@@ -7,5 +7,5 @@
 - [ ] feat: Add score graphics for players
 - [x] feat: Use TLS connection for server (https)
 - [ ] feat: Create a page for each player with races and stats
-- [ ] fix: Results page does should redirect to ranking
+- [x] fix: Results page does should redirect to ranking
 - [ ] feat: Handle race equality

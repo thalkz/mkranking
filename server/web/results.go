@@ -6,7 +6,13 @@ import (
 	"strconv"
 
 	"github.com/thalkz/kart/database"
+	"github.com/thalkz/kart/models"
 )
+
+type ResultsPage struct {
+	Race         *models.Race
+	ShowOkButton bool
+}
 
 func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
 	raceIdStr := r.FormValue("race_id")
@@ -15,11 +21,17 @@ func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to parse key %v: %w", raceIdStr, err)
 	}
 
+	showOkButton := r.FormValue("show_ok_button")
+
 	race, err := database.GetRace(raceId)
 	if err != nil {
 		return fmt.Errorf("failed to get race details: %w", err)
 	}
 
-	renderTemplate(w, "results.html", race)
+	data := &ResultsPage{
+		Race:         race,
+		ShowOkButton: showOkButton == "true",
+	}
+	renderTemplate(w, "results.html", data)
 	return nil
 }

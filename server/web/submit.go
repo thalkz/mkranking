@@ -66,7 +66,7 @@ func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
 	log.Printf("Created race with participants %v\n", ids)
 	log.Printf("Updated ratings to %v\n", newRatings)
 
-	endpoint := fmt.Sprintf("/results?race_id=%v", raceId)
+	endpoint := fmt.Sprintf("/results?race_id=%v&show_ok_button=true", raceId)
 	http.Redirect(w, r, endpoint, http.StatusFound)
 
 	return nil

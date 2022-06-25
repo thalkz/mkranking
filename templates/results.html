@@ -12,7 +12,7 @@
 
       <table>
         <tbody>
-          {{range .Results}}
+          {{range .Race.Results}}
           {{if .Rank}}
           <tr>
             <th scope="row"><b>{{.Rank}}</b></th>
@@ -29,7 +29,9 @@
         </tbody>
       </table>
 
-      <button onclick="location.href='/races'" class="secondary outline">OK !</button>
+      {{if .ShowOkButton}}
+      <button onclick="location.href='/'">OK !</button>
+      {{end}}
     </article>
   </div>
   {{template "footer.html"}}
