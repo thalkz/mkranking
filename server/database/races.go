@@ -56,60 +56,97 @@ func CreateRace(ranking []int, oldRatings, newRatings []float64, season int) (in
 	return raceId, nil
 }
 
-func GetRace(id int) (models.Race, error) {
-	row := db.QueryRow(`SELECT id, ranking, date FROM races WHERE races.id = $1`, id)
-	var race models.Race
-	var ranking pq.Int64Array
-	err := row.Scan(&race.Id, &ranking, &race.Date)
-	for i := range ranking {
-		race.Results = append(race.Results, (int)(ranking[i]))
+func GetRace(id int) (*models.Race, error) {
+	rows, err := db.Query(`
+	SELECT races.id, 
+		races.date, 
+		players.id, 
+		players.name, 
+		players.icon, 
+		RANK() OVER (ORDER BY players_races.id), 
+		players_races.new_rating, 
+		players_races.rating_diff
+			FROM races
+				JOIN players_races ON players_races.race_id = races.id 
+				JOIN players ON players.id = players_races.user_id
+			WHERE races.id = $1
+			ORDER BY players_races.id`, id)
+
+	race := &models.Race{}
+	for rows.Next() {
+		var result models.RaceResult
+		err = rows.Scan(
+			&race.Id,
+			&race.Date,
+			&result.UserId,
+			&result.Name,
+			&result.Icon,
+			&result.Rank,
+			&result.NewRating,
+			&result.RatingDiff,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse race result: %w", err)
+		}
+		race.Results[result.Rank-1] = result
 	}
 	return race, err
 }
 
-func GetRaceDetails(id int) (*models.RaceDetails, error) {
-	race, err := GetRace(id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get race: %w", err)
-	}
-	rows, err := db.Query(`SELECT players_races.user_id, players.name, players.icon, players_races.new_rating, players_races.rating_diff, RANK() OVER (ORDER BY players_races.id)
-		FROM races 
-			JOIN players_races ON players_races.race_id = races.id 
-			JOIN players ON players.id = players_races.user_id
-		WHERE races.id = $1
-		ORDER BY players_races.id`, id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query race details: %w", err)
-	}
-	results := make([]models.RaceDetailsResult, 0)
-	for rows.Next() {
-		var result models.RaceDetailsResult
-		err = rows.Scan(&result.UserId, &result.Name, &result.Icon, &result.NewRating, &result.RatingDiff, &result.RaceRank)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
-		}
-		results = append(results, result)
-	}
-	return &models.RaceDetails{
-		Race:    race,
-		Results: results,
-	}, nil
-}
-
 func GetAllRaces(season int) ([]models.Race, error) {
-	rows, err := db.Query("SELECT id, ranking, date FROM races WHERE season = $1 ORDER BY date DESC", season)
+	rows, err := db.Query(`
+		SELECT 
+			races.id, 
+			races.date, 
+			players.id, 
+			players.name, 
+			players.icon, 
+			RANK() OVER (PARTITION BY players_races.race_id ORDER BY players_races.id), 
+			players_races.new_rating, 
+			players_races.rating_diff
+				FROM races
+					JOIN players_races ON players_races.race_id = races.id 
+					JOIN players ON players.id = players_races.user_id
+				WHERE races.season = $1
+				ORDER BY players_races.id`, season)
 	races := make([]models.Race, 0)
-	var ranking pq.Int64Array
+	previousRaceId := 0
+	raceId := previousRaceId
+	raceDate := ""
+	var race *models.Race
+
 	for rows.Next() {
-		var race models.Race
-		err = rows.Scan(&race.Id, &ranking, &race.Date)
+		var result models.RaceResult
+		err = rows.Scan(
+			&raceId,
+			&raceDate,
+			&result.UserId,
+			&result.Name,
+			&result.Icon,
+			&result.Rank,
+			&result.NewRating,
+			&result.RatingDiff,
+		)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse race result: %w", err)
 		}
-		for i := range ranking {
-			race.Results = append(race.Results, (int)(ranking[i]))
+
+		// Check if row is a new race
+		if raceId != previousRaceId {
+			if race != nil {
+				races = append(races, *race)
+			}
+			race = &models.Race{}
+			race.Id = raceId
+			race.Date = raceDate
+			previousRaceId = raceId
 		}
-		races = append(races, race)
+		race.Results[result.Rank-1] = result
+	}
+
+	// Append last race
+	if race != nil {
+		races = append(races, *race)
 	}
 	return races, err
 }
@@ -124,26 +161,59 @@ func GetPlayerTotalRaceCount(userId int) (int, error) {
 }
 
 func GetPlayerRaces(userId int) ([]models.Race, error) {
-	rows, err := db.Query(`SELECT races.id, races.ranking, races.date
-		FROM races JOIN players_races ON players_races.race_id = races.id 
-		WHERE user_id = $1
-		ORDER BY date`, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query races for player %v: %w", userId, err)
-	}
+	rows, err := db.Query(`
+		SELECT selected_races.race_id, 
+			selected_races.date, 
+			players.id, players.name, 
+			players.icon, RANK() OVER (PARTITION BY players_races.race_id ORDER BY players_races.id), 
+			players_races.new_rating, 
+			players_races.rating_diff
+				FROM (SELECT * FROM races 
+							JOIN players_races ON players_races.race_id = races.id 
+							WHERE user_id = $1
+							ORDER BY date) as selected_races
+					JOIN players_races ON players_races.race_id = selected_races.race_id 
+					JOIN players ON players.id = players_races.user_id
+				ORDER BY players_races.id`, userId)
 
 	races := make([]models.Race, 0)
-	var ranking pq.Int64Array
+	var previousRaceId int
+	var raceId int
+	var raceDate string
+	var race *models.Race
+
 	for rows.Next() {
-		var race models.Race
-		err = rows.Scan(&race.Id, &ranking, &race.Date)
+		var result models.RaceResult
+		err = rows.Scan(
+			&raceId,
+			&raceDate,
+			&result.UserId,
+			&result.Name,
+			&result.Icon,
+			&result.Rank,
+			&result.NewRating,
+			&result.RatingDiff,
+		)
 		if err != nil {
-			return nil, fmt.Errorf("failed to scan race row: %w", err)
+			return nil, fmt.Errorf("failed to parse race result: %w", err)
 		}
-		for i := range ranking {
-			race.Results = append(race.Results, (int)(ranking[i]))
+
+		// Check if row is a new race
+		if raceId != previousRaceId {
+			if race != nil {
+				races = append(races, *race)
+			}
+			race = &models.Race{}
+			race.Id = raceId
+			race.Date = raceDate
+			previousRaceId = raceId
 		}
-		races = append(races, race)
+		race.Results[result.Rank-1] = result
 	}
-	return races, nil
+
+	// Append last race
+	if race != nil {
+		races = append(races, *race)
+	}
+	return races, err
 }

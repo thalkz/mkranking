@@ -15,11 +15,11 @@ func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to parse key %v: %w", raceIdStr, err)
 	}
 
-	raceDetails, err := database.GetRaceDetails(raceId)
+	race, err := database.GetRace(raceId)
 	if err != nil {
 		return fmt.Errorf("failed to get race details: %w", err)
 	}
 
-	renderTemplate(w, "results.html", raceDetails)
+	renderTemplate(w, "results.html", race)
 	return nil
 }

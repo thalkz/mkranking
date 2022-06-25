@@ -9,13 +9,7 @@ import (
 )
 
 type racesPage struct {
-	Races []raceWithPlayers
-}
-
-type raceWithPlayers struct {
-	Id      int
-	Players []models.Player
-	Date    string
+	Races []models.Race
 }
 
 func RacesHandler(w http.ResponseWriter, r *http.Request) error {
@@ -26,45 +20,17 @@ func RacesHandler(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to get all races: %w", err)
 	}
 
-	players, err := database.GetAllPlayers(season)
-	if err != nil {
-		return fmt.Errorf("failed to get all players: %w", err)
-	}
-
-	var playersMap = make(map[int]models.Player)
-	for _, player := range players {
-		playersMap[player.Id] = player
-	}
-
-	racesWithPlayers := make([]raceWithPlayers, len(races))
-
-	for i, race := range races {
-		var racePlayers = make([]models.Player, 4)
-		for i, playerId := range race.Results {
-			value, ok := playersMap[playerId]
-			if ok {
-				racePlayers[i] = value
-			} else {
-				racePlayers[i] = models.Player{
-					Name: "[deleted]",
-				}
-			}
-		}
-
-		timeago, err := parseTimeAgo("2006-01-02T15:04:05Z", race.Date)
+	// Convert to timeago
+	for i := range races {
+		timeago, err := parseTimeAgo("2006-01-02T15:04:05Z", races[i].Date)
 		if err != nil {
 			return fmt.Errorf("failed to parse timeago: %w", err)
 		}
-
-		racesWithPlayers[i] = raceWithPlayers{
-			Id:      race.Id,
-			Date:    timeago,
-			Players: racePlayers,
-		}
+		races[i].Date = timeago
 	}
 
 	data := racesPage{
-		Races: racesWithPlayers,
+		Races: races,
 	}
 	renderTemplate(w, "races.html", data)
 	return nil

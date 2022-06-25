@@ -1,12 +1,45 @@
 <!DOCTYPE html>
 <html lang="fr">
 
-{{template "head.html" }}
+{{template "head.html"}}
 
 <body>
   {{template "nav.html"}}
 
-  {{template "construction.html"}}
+  <main class="container">
+    <hgroup>
+      <img src="static/characters/{{.Player.Icon}}.png" width="60" />
+      <h1>{{.Player.Name}}</h1>
+      <kbd>{{.Player.Rating}} pts</kbd>
+      <p>{{.Player.RacesCount}} courses</p>
+    </hgroup>
+
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">1er</th>
+          <th scope="col">2eme</th>
+          <th scope="col">3eme</th>
+          <th scope="col">4eme</th>
+          <th scope="col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Races}}
+        <tr onclick="location.href='/results?race_id={{.Id}}'" style="cursor:pointer">
+          {{range .Results}}
+          <td scope="row">
+            {{if .Name}}
+            <img src="static/characters/{{.Icon}}.png" width="30" alt="{{.Name}}"> {{.Name}}
+            {{end}}
+          </td>
+          {{end}}
+          <td scope="row">{{.Date}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </main>
 
   {{template "footer.html"}}
 

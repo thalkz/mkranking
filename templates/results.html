@@ -12,18 +12,20 @@
 
       <table>
         <tbody>
-          {{ range .Results }}
+          {{range .Results}}
+          {{if .Rank}}
           <tr>
-            <th scope="row"><b>{{ .RaceRank }}</b></th>
-            <th><img src="static/characters/{{ .Icon }}.png" width="30" /><b>{{ .Name }}</b></th>
-            {{ if gt .RatingDiff 0.0 }}
-            <th><kbd style="background: green;">+{{ .RatingDiff }} pts</kdb>
+            <th scope="row"><b>{{.Rank}}</b></th>
+            <th><img src="static/characters/{{.Icon}}.png" width="30" /><b>{{.Name}}</b></th>
+            {{if gt .RatingDiff 0.0}}
+            <th><kbd style="background: green;">+{{.RatingDiff}} pts</kdb>
             </th>
-            {{ else }}
-            <th><kbd style="background: red;">{{ .RatingDiff }} pts</kbd></th>
-            {{ end }}
+            {{else}}
+            <th><kbd style="background: red;">{{.RatingDiff}} pts</kbd></th>
+            {{end}}
           </tr>
-          {{ end }}
+          {{end}}
+          {{end}}
         </tbody>
       </table>
 

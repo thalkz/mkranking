@@ -16,7 +16,7 @@
           <select id="first" name="first" required>
             <option value="">--Selectionner un joueur--</option>
             {{range .Players}}
-            <option value="{{ .Id }}">{{ .Name }}</option>
+            <option value="{{.Id}}">{{.Name}}</option>
             {{end}}
           </select>
 
@@ -24,7 +24,7 @@
           <select id="second" name="second" required>
             <option value="">--Selectionner un joueur--</option>
             {{range .Players}}
-            <option value="{{ .Id }}">{{ .Name }}</option>
+            <option value="{{.Id}}">{{.Name}}</option>
             {{end}}
           </select>
 
@@ -32,7 +32,7 @@
           <select id="third" name="third">
             <option value="">--Selectionner un joueur--</option>
             {{range .Players}}
-            <option value="{{ .Id }}">{{ .Name }}</option>
+            <option value="{{.Id}}">{{.Name}}</option>
             {{end}}
           </select>
 
@@ -40,7 +40,7 @@
           <select id="fourth" name="fourth">
             <option value="">--Selectionner un joueur--</option>
             {{range .Players}}
-            <option value="{{ .Id }}">{{ .Name }}</option>
+            <option value="{{.Id}}">{{.Name}}</option>
             {{end}}
           </select>
         </fieldset>

@@ -11,11 +11,11 @@
       <form>
         <label for="name">
           Ton Pseudo
-          <input type="text" id="name" name="name" placeholder="{{ .NamePlaceholder }}" required>
+          <input type="text" id="name" name="name" placeholder="{{.NamePlaceholder}}" required>
         </label>
 
         <div style="display: grid; grid-template-columns: auto auto auto;">
-          {{ range .Icons }}
+          {{range .Icons}}
           <div>
             <input type="radio" id="icon" name="icon" value="{{.}}">
             <img src="static/characters/{{.}}.png" width="50" />
