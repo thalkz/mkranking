@@ -14,15 +14,20 @@ func ComputeRatings(ratings []float64) []float64 {
 		expected := computeExpectedScore(i, ratings)
 		actual := computeActualScore(i+1, len(ratings))
 		updatedRating := computeUpdatedRating(ratings[i], expected, actual, len(ratings))
-		updatedRating = floorToDecimal(updatedRating)
+		updatedRating = round(updatedRating)
 		updatedRatings[i] = updatedRating
 	}
 	return updatedRatings
 }
 
-/// Returns the rating, but floored to the decimal. Ex: 10.1931 -> 10.1
-func floorToDecimal(rating float64) float64 {
-	return float64(int(rating*10)) / 10.0
+/// Round to closest integer
+func round(rating float64) float64 {
+	floored := float64(int(rating))
+	if rating-floored >= 0.5 {
+		return floored + 1
+	} else {
+		return floored
+	}
 }
 
 /// Returns the updated score for a player, given his expected and actual score
