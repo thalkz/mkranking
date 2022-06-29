@@ -8,13 +8,13 @@ import (
 	"github.com/thalkz/kart/models"
 )
 
-func GetAllPlayersEvents(season int) (map[int][]models.HistoryEvent, error) {
+func GetRankedPlayersEvents(season int, minRaces int) (map[int][]models.HistoryEvent, error) {
 	rows, err := db.Query(
 		`SELECT players.id AS player_id, races.id AS race_id, date, new_rating
 			FROM (SELECT * FROM races WHERE season = $1) as races
-				CROSS JOIN (SELECT * FROM players WHERE season = $1) as players
+				CROSS JOIN (SELECT * FROM players WHERE season = $1 AND races_count >= $2) as players
 				LEFT JOIN players_races ON players.id = players_races.user_id AND races.id = players_races.race_id
-				ORDER BY player_id, date`, season)
+				ORDER BY player_id, date`, season, minRaces)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query all history: %w", err)
 	}
