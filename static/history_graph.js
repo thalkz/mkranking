@@ -17,10 +17,10 @@ response.then((data) => {
     Object.values(events)
       .flat()
       .map((v) => v.rating)
-  );
+  ).reverse();
 
-  const width = 400;
-  const height = 600;
+  const width = window.innerWidth;
+  const height = window.innerHeight *4/5;
   const xRange = [margin, width - margin];
   const yRange = [margin, height - margin];
   const xScale = d3.scaleLinear(xDomain, xRange);

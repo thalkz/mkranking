@@ -14,7 +14,7 @@ func GetAllPlayersEvents(season int) (map[int][]models.HistoryEvent, error) {
 			FROM (SELECT * FROM races WHERE season = $1) as races
 				CROSS JOIN (SELECT * FROM players WHERE season = $1) as players
 				LEFT JOIN players_races ON players.id = players_races.user_id AND races.id = players_races.race_id
-				ORDER BY date`, season)
+				ORDER BY player_id, date`, season)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query all history: %w", err)
 	}
