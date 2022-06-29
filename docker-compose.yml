@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     env_file:
-      - .env-local
+      - .env
     ports:
       - "$POSTGRES_PORT:$POSTGRES_PORT"
     volumes:
@@ -16,7 +16,7 @@ services:
     image: ghcr.io/thalkz/kart_server
     restart: always
     env_file:
-      - .env-local
+      - .env
     depends_on:
       - database
     ports:
