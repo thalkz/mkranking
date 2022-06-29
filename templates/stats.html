@@ -6,10 +6,16 @@
 <body>
   {{template "nav.html"}}
 
-  {{template "construction.html"}}
+  <main class="container-fluid">
+    <figure>
+    <div id="canvas"></div>
+    </figure>
+  </main>
 
   {{template "footer.html"}}
 
 </body>
+<script src="static/d3.min.js"></script>
+<script src="static/history_graph.js"></script>
 
 </html>

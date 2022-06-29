@@ -7,10 +7,10 @@ type Race struct {
 }
 
 type RaceResult struct {
-	Rank       int
-	UserId     int
-	Name       string
-	Icon       int
-	NewRating  float64
-	RatingDiff float64
+	Rank       int     `json:"rank"`
+	UserId     int     `json:"user_id"`
+	Name       string  `json:"name"`
+	Icon       int     `json:"icon"`
+	NewRating  float64 `json:"new_rating"`
+	RatingDiff float64 `json:"rating_diff"`
 }

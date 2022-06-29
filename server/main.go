@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/thalkz/kart/api"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/web"
 )
@@ -37,6 +38,7 @@ func redirect(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	// Serve routes
+	http.HandleFunc("/history", makeHandler(api.HistoryHandler))
 	http.HandleFunc("/player", makeHandler(web.PlayerHandler))
 	http.HandleFunc("/results", makeHandler(web.ResultsPageHandler))
 	http.HandleFunc("/submit", makeHandler(web.SubmitHandler))
