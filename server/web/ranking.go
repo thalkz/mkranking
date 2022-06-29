@@ -3,11 +3,11 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
+	"github.com/thalkz/kart/utils"
 )
 
 type RankingPage struct {
@@ -18,22 +18,13 @@ type RankingPage struct {
 	UnrankedPlayers    []models.Player
 }
 
-func parseSeason(r *http.Request) int {
-	seasonStr := r.FormValue("season")
-	season, err := strconv.Atoi(seasonStr)
-	if seasonStr == "" || err != nil {
-		return config.Season
-	}
-	return season
-}
-
 func RankingHandler(w http.ResponseWriter, r *http.Request) error {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return nil
 	}
 
-	season := parseSeason(r)
+	season := utils.ParseSeason(r)
 
 	rankedPlayers, err := database.GetRankedPlayers(season, config.MinRacesCount)
 	if err != nil {
@@ -45,7 +36,7 @@ func RankingHandler(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to get unranked players: %w", err)
 	}
 
-	timeUntil, err := parseTimeUntil("2006-01-02", config.SeasonEndDate)
+	timeUntil, err := utils.ParseTimeUntil("2006-01-02", config.SeasonEndDate)
 	if err != nil {
 		return fmt.Errorf("failed to parse timeuntil: %w", err)
 	}

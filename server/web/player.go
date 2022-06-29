@@ -7,6 +7,7 @@ import (
 
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
+	"github.com/thalkz/kart/utils"
 )
 
 type PlayerPage struct {
@@ -33,7 +34,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) error {
 
 	// Convert to timeago
 	for i := range playerRaces {
-		timeago, err := parseTimeAgo("2006-01-02T15:04:05Z", playerRaces[i].Date)
+		timeago, err := utils.ParseTimeAgo("2006-01-02T15:04:05Z", playerRaces[i].Date)
 		if err != nil {
 			return fmt.Errorf("failed to parse timeago: %w", err)
 		}

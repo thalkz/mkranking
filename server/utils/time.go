@@ -1,11 +1,11 @@
-package web
+package utils
 
 import (
 	"fmt"
 	"time"
 )
 
-func parseTimeUntil(layout string, value string) (string, error) {
+func ParseTimeUntil(layout string, value string) (string, error) {
 	now := time.Now().Unix()
 	date, err := time.Parse(layout, value)
 	if err != nil {
@@ -29,7 +29,7 @@ func parseTimeUntil(layout string, value string) (string, error) {
 	return timeuntil, nil
 }
 
-func parseTimeAgo(layout string, value string) (string, error) {
+func ParseTimeAgo(layout string, value string) (string, error) {
 	now := time.Now().Unix()
 	date, err := time.Parse(layout, value)
 	if err != nil {
