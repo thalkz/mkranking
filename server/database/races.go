@@ -70,7 +70,7 @@ func GetRace(id int) (*models.Race, error) {
 				JOIN players_races ON players_races.race_id = races.id 
 				JOIN players ON players.id = players_races.user_id
 			WHERE races.id = $1
-			ORDER BY players_races.id`, id)
+			ORDER BY players_races.id DESC`, id)
 
 	race := &models.Race{}
 	for rows.Next() {
@@ -108,7 +108,7 @@ func GetAllRaces(season int) ([]models.Race, error) {
 					JOIN players_races ON players_races.race_id = races.id 
 					JOIN players ON players.id = players_races.user_id
 				WHERE races.season = $1
-				ORDER BY players_races.id`, season)
+				ORDER BY players_races.id DESC`, season)
 	races := make([]models.Race, 0)
 	previousRaceId := 0
 	raceId := previousRaceId
@@ -174,7 +174,7 @@ func GetPlayerRaces(userId int) ([]models.Race, error) {
 							ORDER BY date) as selected_races
 					JOIN players_races ON players_races.race_id = selected_races.race_id 
 					JOIN players ON players.id = players_races.user_id
-				ORDER BY players_races.id`, userId)
+				ORDER BY players_races.id DESC`, userId)
 
 	races := make([]models.Race, 0)
 	var previousRaceId int
