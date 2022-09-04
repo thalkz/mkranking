@@ -44,8 +44,10 @@ func selectParticipantsHandler(w http.ResponseWriter, r *http.Request) error {
 func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
 	ids, err := parseParticipantsKeys(r)
 	if err != nil {
-		return fmt.Errorf("failed to parse participants: %w", err)
+		return fmt.Errorf("failed to parse the participants: %w", err)
 	}
+
+	ties := parseTies(r, len(ids))
 
 	players, err := database.GetPlayers(ids)
 	if err != nil {
@@ -57,7 +59,10 @@ func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
 		oldRatings[i] = players[i].Rating
 	}
 
-	newRatings := elo.ComputeRatings(oldRatings)
+	newRatings, err := elo.ComputeRatings(oldRatings, ties)
+	if err != nil {
+		return fmt.Errorf("failed to compute rankings: %w", err)
+	}
 
 	raceId, err := database.CreateRace(ids, oldRatings, newRatings, config.Season)
 	if err != nil {
@@ -114,4 +119,19 @@ func appendParticipantKey(ids []int, r *http.Request, key string, isRequired boo
 		}
 	}
 	return append(ids, value), nil
+}
+
+func parseTies(r *http.Request, len int) []bool {
+	ties := make([]bool, len)
+
+	if len >= 2 && r.FormValue("firstTied") == "on" {
+		ties[0] = true
+	}
+	if len >= 3 && r.FormValue("secondTied") == "on" {
+		ties[1] = true
+	}
+	if len >= 4 && r.FormValue("thirdTied") == "on" {
+		ties[2] = true
+	}
+	return ties
 }

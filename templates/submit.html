@@ -20,6 +20,11 @@
             {{end}}
           </select>
 
+          <label for="firstTied">
+            <input type="checkbox" id="firstTied" name="firstTied">
+            ex-aequo avec le suivant
+          </label>
+
           <label for="second">2eme</label>
           <select id="second" name="second" required>
             <option value="">--Selectionner un joueur--</option>
@@ -28,6 +33,11 @@
             {{end}}
           </select>
 
+          <label for="secondTied">
+            <input type="checkbox" id="secondTied" name="secondTied">
+            ex-aequo avec le suivant
+          </label>
+
           <label for="third">3eme</label>
           <select id="third" name="third">
             <option value="">--Selectionner un joueur--</option>
@@ -35,6 +45,11 @@
             <option value="{{.Id}}">{{.Name}}</option>
             {{end}}
           </select>
+
+          <label for="thirdTied">
+            <input type="checkbox" id="thirdTied" name="thirdTied">
+            ex-aequo avec le suivant
+          </label>
 
           <label for="fourth">4eme</label>
           <select id="fourth" name="fourth">

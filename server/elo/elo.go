@@ -1,6 +1,7 @@
 package elo
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -8,16 +9,23 @@ var D float64 = 400.0
 var K float64 = 32.0
 
 /// Compute updated ratings for all players
-func ComputeRatings(ratings []float64) []float64 {
-	updatedRatings := make([]float64, len(ratings))
-	for i := range ratings {
+func ComputeRatings(ratings []float64, ties []bool) ([]float64, error) {
+	if len(ratings) != len(ties) {
+		return nil, fmt.Errorf("ratings and equalities should have the same length")
+	}
+
+	racePositions := computePositions(ties)
+
+	N := len(ratings)
+	updatedRatings := make([]float64, N)
+	for i := range racePositions {
 		expected := computeExpectedScore(i, ratings)
-		actual := computeActualScore(i+1, len(ratings))
-		updatedRating := computeUpdatedRating(ratings[i], expected, actual, len(ratings))
+		actual := computeActualScore(racePositions[i], N)
+		updatedRating := computeUpdatedRating(ratings[i], expected, actual, N)
 		updatedRating = round(updatedRating)
 		updatedRatings[i] = updatedRating
 	}
-	return updatedRatings
+	return updatedRatings, nil
 }
 
 /// Round to closest integer
@@ -30,6 +38,26 @@ func round(rating float64) float64 {
 	}
 }
 
+// Computes a race position, base on ties
+// For example, if 1st is tied with second, they will both have position 1.5 (instead of 1 and 2)
+// This works for any amount of consecutive ties
+func computePositions(ties []bool) []float64 {
+	first := 0
+	sum := 0
+	out := make([]float64, len(ties))
+	for i := range ties {
+		sum += i + 1
+		if !ties[i] {
+			for k := first; k <= i; k++ {
+				out[k] = float64(sum) / float64(1+i-first)
+			}
+			first = i + 1
+			sum = 0
+		}
+	}
+	return out
+}
+
 /// Returns the updated score for a player, given his expected and actual score
 func computeUpdatedRating(rating, expectedScore, actualScore float64, N int) float64 {
 	return rating + K*float64(N-1.0)*(actualScore-expectedScore)
@@ -37,8 +65,8 @@ func computeUpdatedRating(rating, expectedScore, actualScore float64, N int) flo
 
 /// Returns the actual score, given the player's position
 /// 1 if the player finished 1st and 0 if he finished last
-func computeActualScore(position, N int) float64 {
-	return float64(N-position) / (float64(N*(N-1)) / 2.0)
+func computeActualScore(position float64, N int) float64 {
+	return (float64(N) - position) / (float64(N*(N-1)) / 2.0)
 }
 
 /// Returns the expected score for a player, given all ratings
