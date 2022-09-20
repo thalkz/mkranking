@@ -30,12 +30,6 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request) error) http.Handler
 	}
 }
 
-func redirect(w http.ResponseWriter, req *http.Request) {
-	http.Redirect(w, req,
-		"https://"+req.Host+req.URL.String(),
-		http.StatusMovedPermanently)
-}
-
 func main() {
 	// Serve routes
 	http.HandleFunc("/history", makeHandler(api.HistoryHandler))
@@ -62,20 +56,10 @@ func main() {
 	// Get port
 	httpPort := os.Getenv("SERVER_PORT")
 	if httpPort == "" {
-		httpPort = "80"
+		httpPort = "3000"
 	}
-
-	tlsKeysFolder := os.Getenv("TLS_KEYS_PATH")
-	crtFilename := os.Getenv("TLS_CRT_FILENAME")
-	keyFilename := os.Getenv("TLS_KEY_FILENAME")
 
 	// Start server
-	if tlsKeysFolder == "" || crtFilename == "" || keyFilename == "" {
-		log.Println("Listening on port", httpPort)
-		log.Fatal(http.ListenAndServe(":"+httpPort, nil))
-	} else {
-		go http.ListenAndServe(":80", http.HandlerFunc(redirect))
-		log.Println("Listening HTTPS on port", httpPort)
-		log.Fatal(http.ListenAndServeTLS(":"+httpPort, tlsKeysFolder+crtFilename, tlsKeysFolder+keyFilename, nil))
-	}
+	log.Println("Listening on port", httpPort)
+	log.Fatal(http.ListenAndServe(":"+httpPort, nil))
 }
