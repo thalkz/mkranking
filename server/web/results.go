@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
 )
@@ -14,7 +15,7 @@ type ResultsPage struct {
 	ShowOkButton bool
 }
 
-func ResultsPageHandler(w http.ResponseWriter, r *http.Request) error {
+func ResultsPageHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	raceIdStr := r.FormValue("race_id")
 	raceId, err := strconv.Atoi(raceIdStr)
 	if err != nil {

@@ -7,11 +7,11 @@ import (
 	"github.com/thalkz/kart/config"
 )
 
-func ParseSeason(r *http.Request) int {
+func ParseSeason(cfg *config.Config, r *http.Request) int {
 	seasonStr := r.FormValue("season")
 	season, err := strconv.Atoi(seasonStr)
 	if seasonStr == "" || err != nil {
-		return config.Season
+		season = cfg.GetSeason()
 	}
 	return season
 }

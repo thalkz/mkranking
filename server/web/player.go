@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
 	"github.com/thalkz/kart/utils"
@@ -15,7 +16,7 @@ type PlayerPage struct {
 	Races  []models.Race
 }
 
-func PlayerHandler(w http.ResponseWriter, r *http.Request) error {
+func PlayerHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	playerIdStr := r.FormValue("id")
 	playerId, err := strconv.Atoi(playerIdStr)
 	if err != nil {

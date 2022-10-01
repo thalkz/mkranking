@@ -19,7 +19,7 @@ var (
 
 var db *sql.DB
 
-func Open() (func() error, error) {
+func Open(cfg *config.Config) (func() error, error) {
 	// Default config variables
 	if host == "" {
 		host = "localhost"
@@ -59,7 +59,7 @@ func Open() (func() error, error) {
 	if err = createRacesTable(); err != nil {
 		return nil, fmt.Errorf("failed to create races table %w", err)
 	}
-	if err = createPlayersRacesTable(); err != nil {
+	if err = createPlayersRacesTable(cfg); err != nil {
 		return nil, fmt.Errorf("failed to create players_races table %w", err)
 	}
 
@@ -92,7 +92,7 @@ func createRacesTable() error {
 	return err
 }
 
-func createPlayersRacesTable() error {
+func createPlayersRacesTable(cfg *config.Config) error {
 	statement := `
 	CREATE TABLE IF NOT EXISTS players_races (
 		id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -102,6 +102,6 @@ func createPlayersRacesTable() error {
 		new_rating real NOT NULL DEFAULT %v,
 		rating_diff real NOT NULL DEFAULT 0
 	);`
-	_, err := db.Exec(fmt.Sprintf(statement, config.InitialRating, config.InitialRating))
+	_, err := db.Exec(fmt.Sprintf(statement, cfg.InitialRating, cfg.InitialRating))
 	return err
 }

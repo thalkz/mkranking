@@ -7,10 +7,17 @@
 
   <main class="container">
     <hgroup>
+      {{if .IsCompetitionActive}}
       <h4>Classement Season {{.Season}}</h4>
-      <p><em>Fin dans {{.TimeUntilSeasonEnd}}</em></p>
+      <p><em>Fin de la compétition dans {{.TimeUntilEnd}}</em></p>
+      {{else}}
+      <h4>Classement Season {{.Season}} - compétition terminée</h4>
+      <p><em>La prochaine saison débute dans {{.TimeUntilEnd}}</em></p>
+      {{end}}
     </hgroup>
+    {{if .IsCompetitionActive}}
     <a href="/submit" role="button">Nouvelle course</a>
+    {{end}}
     <p></p>
     <table>
       <tbody>
@@ -40,7 +47,9 @@
       </tbody>
     </table>
     <footer>
+      {{if .IsCompetitionActive}}
       <a role="button" href="/new" class="secondary outline">Ajouter un joueur</a>
+      {{end}}
       <br/><br />
     </footer>
   </main>

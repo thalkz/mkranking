@@ -11,15 +11,15 @@ import (
 	"github.com/thalkz/kart/utils"
 )
 
-func HistoryHandler(w http.ResponseWriter, r *http.Request) error {
-	season := utils.ParseSeason(r)
+func HistoryHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
+	season := utils.ParseSeason(cfg, r)
 
-	players, err := database.GetRankedPlayers(season, config.MinRacesCount)
+	players, err := database.GetRankedPlayers(season, cfg.MinRacesCount)
 	if err != nil {
 		return fmt.Errorf("failed to get all players: %w", err)
 	}
 
-	events, err := database.GetRankedPlayersEvents(season, config.MinRacesCount)
+	events, err := database.GetRankedPlayersEvents(cfg, season)
 	if err != nil {
 		return fmt.Errorf("failed to get all history: %w", err)
 	}

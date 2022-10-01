@@ -18,18 +18,18 @@ type participantsPage struct {
 
 const NO_PLAYER_ID = -1
 
-func SubmitHandler(w http.ResponseWriter, r *http.Request) error {
+func SubmitHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	first := r.FormValue("first")
 
 	if first != "" {
-		return createRaceHandler(w, r)
+		return createRaceHandler(cfg, w, r)
 	} else {
-		return selectParticipantsHandler(w, r)
+		return selectParticipantsHandler(cfg, w, r)
 	}
 }
 
-func selectParticipantsHandler(w http.ResponseWriter, r *http.Request) error {
-	players, err := database.GetAllPlayers(config.Season)
+func selectParticipantsHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
+	players, err := database.GetAllPlayers(cfg.GetSeason())
 	if err != nil {
 		return fmt.Errorf("failed to get all players: %w", err)
 	}
@@ -41,7 +41,7 @@ func selectParticipantsHandler(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
+func createRaceHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	ids, err := parseParticipantsKeys(r)
 	if err != nil {
 		return fmt.Errorf("failed to parse the participants: %w", err)
@@ -59,12 +59,12 @@ func createRaceHandler(w http.ResponseWriter, r *http.Request) error {
 		oldRatings[i] = players[i].Rating
 	}
 
-	newRatings, err := elo.ComputeRatings(oldRatings, ties)
+	newRatings, err := elo.ComputeRatings(cfg, oldRatings, ties)
 	if err != nil {
 		return fmt.Errorf("failed to compute rankings: %w", err)
 	}
 
-	raceId, err := database.CreateRace(ids, oldRatings, newRatings, config.Season)
+	raceId, err := database.CreateRace(ids, oldRatings, newRatings, cfg.GetSeason())
 	if err != nil {
 		return fmt.Errorf("failed creating race: %w", err)
 	}

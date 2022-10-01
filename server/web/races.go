@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/models"
 	"github.com/thalkz/kart/utils"
@@ -13,8 +14,8 @@ type racesPage struct {
 	Races []models.Race
 }
 
-func RacesHandler(w http.ResponseWriter, r *http.Request) error {
-	season := utils.ParseSeason(r)
+func RacesHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
+	season := utils.ParseSeason(cfg, r)
 
 	races, err := database.GetAllRaces(season)
 	if err != nil {

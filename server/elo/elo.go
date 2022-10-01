@@ -3,13 +3,12 @@ package elo
 import (
 	"fmt"
 	"math"
+
+	"github.com/thalkz/kart/config"
 )
 
-var D float64 = 400.0
-var K float64 = 32.0
-
-/// Compute updated ratings for all players
-func ComputeRatings(ratings []float64, ties []bool) ([]float64, error) {
+// / Compute updated ratings for all players
+func ComputeRatings(cfg *config.Config, ratings []float64, ties []bool) ([]float64, error) {
 	if len(ratings) != len(ties) {
 		return nil, fmt.Errorf("ratings and equalities should have the same length")
 	}
@@ -19,16 +18,16 @@ func ComputeRatings(ratings []float64, ties []bool) ([]float64, error) {
 	N := len(ratings)
 	updatedRatings := make([]float64, N)
 	for i := range racePositions {
-		expected := computeExpectedScore(i, ratings)
+		expected := computeExpectedScore(cfg, i, ratings)
 		actual := computeActualScore(racePositions[i], N)
-		updatedRating := computeUpdatedRating(ratings[i], expected, actual, N)
+		updatedRating := computeUpdatedRating(cfg, ratings[i], expected, actual, N)
 		updatedRating = round(updatedRating)
 		updatedRatings[i] = updatedRating
 	}
 	return updatedRatings, nil
 }
 
-/// Round to closest integer
+// / Round to closest integer
 func round(rating float64) float64 {
 	floored := float64(int(rating))
 	if rating-floored >= 0.5 {
@@ -58,31 +57,31 @@ func computePositions(ties []bool) []float64 {
 	return out
 }
 
-/// Returns the updated score for a player, given his expected and actual score
-func computeUpdatedRating(rating, expectedScore, actualScore float64, N int) float64 {
-	return rating + K*float64(N-1.0)*(actualScore-expectedScore)
+// / Returns the updated score for a player, given his expected and actual score
+func computeUpdatedRating(cfg *config.Config, rating, expectedScore, actualScore float64, N int) float64 {
+	return rating + cfg.Elo.K*float64(N-1.0)*(actualScore-expectedScore)
 }
 
-/// Returns the actual score, given the player's position
-/// 1 if the player finished 1st and 0 if he finished last
+// / Returns the actual score, given the player's position
+// / 1 if the player finished 1st and 0 if he finished last
 func computeActualScore(position float64, N int) float64 {
 	return (float64(N) - position) / (float64(N*(N-1)) / 2.0)
 }
 
-/// Returns the expected score for a player, given all ratings
-/// The expected score is between 0 and 1 and represents a probability of winning
-func computeExpectedScore(currentIndex int, ratings []float64) float64 {
+// / Returns the expected score for a player, given all ratings
+// / The expected score is between 0 and 1 and represents a probability of winning
+func computeExpectedScore(cfg *config.Config, currentIndex int, ratings []float64) float64 {
 	N := len(ratings)
 	sum := 0.0
 	for i := range ratings {
 		if i != currentIndex {
-			sum += expectedTwoPlayersScore(ratings[currentIndex], ratings[i])
+			sum += expectedTwoPlayersScore(cfg, ratings[currentIndex], ratings[i])
 		}
 	}
 	return sum / (float64(N*(N-1)) / 2.0)
 }
 
-/// Returns the expected score for player A, given playerA and playerB's current ratings
-func expectedTwoPlayersScore(ratingA, ratingB float64) float64 {
-	return 1.0 / (1.0 + math.Pow(10.0, (ratingB-ratingA)/D))
+// / Returns the expected score for player A, given playerA and playerB's current ratings
+func expectedTwoPlayersScore(cfg *config.Config, ratingA, ratingB float64) float64 {
+	return 1.0 / (1.0 + math.Pow(10.0, (ratingB-ratingA)/cfg.Elo.D))
 }

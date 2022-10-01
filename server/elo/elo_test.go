@@ -3,7 +3,16 @@ package elo
 import (
 	"math"
 	"testing"
+
+	"github.com/thalkz/kart/config"
 )
+
+var eloTestConfig = &config.Config{
+	Elo: config.ConfigElo{
+		D: 1000.0,
+		K: 32.0,
+	},
+}
 
 func TestComputeRatings(T *testing.T) {
 	oldRatings := []float64{
@@ -21,7 +30,7 @@ func TestComputeRatings(T *testing.T) {
 		false,
 	}
 
-	newRatings, err := ComputeRatings(oldRatings, ties)
+	newRatings, err := ComputeRatings(eloTestConfig, oldRatings, ties)
 	if err != nil {
 		T.Errorf("failed to compute ratings: %v", err)
 	}

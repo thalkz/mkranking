@@ -8,14 +8,28 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/thalkz/kart/api"
+	"github.com/thalkz/kart/config"
 	"github.com/thalkz/kart/database"
 	"github.com/thalkz/kart/web"
 )
 
-func makeHandler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+var cfg = &config.Config{
+	FirstSeasonDate: time.Date(2022, time.September, 17, 0, 0, 0, 0, time.Local),
+	SeasonOffset:    3,
+	CompetitionDays: 14,
+	RestDays:        14,
+	MinRacesCount:   5,
+	InitialRating:   1000.0,
+	Elo: config.ConfigElo{
+		K: 32.0,
+		D: 400.0,
+	},
+}
+
+func makeHandler(fn func(*config.Config, http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		err := fn(w, r)
+		err := fn(cfg, w, r)
 		end := time.Now()
 
 		var statusCode = http.StatusOK
@@ -47,7 +61,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Open database
-	var cleanup, err = database.Open()
+	var cleanup, err = database.Open(cfg)
 	if err != nil {
 		log.Fatalln("failed to open database:", err)
 	}

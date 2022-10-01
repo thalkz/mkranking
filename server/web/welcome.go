@@ -2,6 +2,8 @@ package web
 
 import (
 	"net/http"
+
+	"github.com/thalkz/kart/config"
 )
 
 type welcomePlayerPage struct {
@@ -9,7 +11,7 @@ type welcomePlayerPage struct {
 	Icon string
 }
 
-func WelcomePlayerPage(w http.ResponseWriter, r *http.Request) error {
+func WelcomePlayerPage(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	name := r.FormValue("name")
 	icon := r.FormValue("icon")
 

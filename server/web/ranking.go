@@ -11,42 +11,54 @@ import (
 )
 
 type RankingPage struct {
-	Season             int
-	TimeUntilSeasonEnd string
-	MinRacesCount      int
-	RankedPlayers      []models.Player
-	UnrankedPlayers    []models.Player
+	Season              int
+	TimeUntilEnd        string
+	IsCompetitionActive bool
+	MinRacesCount       int
+	RankedPlayers       []models.Player
+	UnrankedPlayers     []models.Player
 }
 
-func RankingHandler(w http.ResponseWriter, r *http.Request) error {
+func RankingHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return nil
 	}
 
-	season := utils.ParseSeason(r)
+	season := utils.ParseSeason(cfg, r)
 
-	rankedPlayers, err := database.GetRankedPlayers(season, config.MinRacesCount)
+	rankedPlayers, err := database.GetRankedPlayers(season, cfg.MinRacesCount)
 	if err != nil {
 		return fmt.Errorf("failed to get ranked players: %w", err)
 	}
 
-	unrankedPlayers, err := database.GetUnrankedPlayers(season, config.MinRacesCount)
+	unrankedPlayers, err := database.GetUnrankedPlayers(season, cfg.MinRacesCount)
 	if err != nil {
 		return fmt.Errorf("failed to get unranked players: %w", err)
 	}
 
-	timeUntil, err := utils.ParseTimeUntil("2006-01-02", config.SeasonEndDate)
-	if err != nil {
-		return fmt.Errorf("failed to parse timeuntil: %w", err)
+	isCompetitionActive := cfg.IsCompetitionActive()
+	var timeUntilEnd string
+
+	if isCompetitionActive {
+		timeUntilEnd, err = utils.ParseTimeUntil(cfg.GetCompetitionEndDate())
+		if err != nil {
+			return fmt.Errorf("failed to parse timeuntil: %w", err)
+		}
+	} else {
+		timeUntilEnd, err = utils.ParseTimeUntil(cfg.GetNextSeasonStartDate())
+		if err != nil {
+			return fmt.Errorf("failed to parse timeuntil: %w", err)
+		}
 	}
 
 	data := RankingPage{
-		Season:             season,
-		TimeUntilSeasonEnd: timeUntil,
-		MinRacesCount:      config.MinRacesCount,
-		RankedPlayers:      rankedPlayers,
-		UnrankedPlayers:    unrankedPlayers,
+		Season:              season,
+		TimeUntilEnd:        timeUntilEnd,
+		IsCompetitionActive: isCompetitionActive,
+		MinRacesCount:       cfg.MinRacesCount,
+		RankedPlayers:       rankedPlayers,
+		UnrankedPlayers:     unrankedPlayers,
 	}
 	renderTemplate(w, "ranking.html", data)
 	return nil

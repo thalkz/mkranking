@@ -5,13 +5,8 @@ import (
 	"time"
 )
 
-func ParseTimeUntil(layout string, value string) (string, error) {
+func ParseTimeUntil(date time.Time) (string, error) {
 	now := time.Now().Unix()
-	date, err := time.Parse(layout, value)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse date: %w", err)
-	}
-
 	seconds := date.Unix() - now
 	hours := int(seconds / 3600)
 	days := int(hours / 24)

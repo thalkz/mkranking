@@ -15,23 +15,23 @@ type chooseNameAndIconPage struct {
 	Icons           []int
 }
 
-func NewPlayerHandler(w http.ResponseWriter, r *http.Request) error {
+func NewPlayerHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	name := r.FormValue("name")
 	icon := r.FormValue("icon")
 	if name != "" && icon != "" {
-		return createPlayerHandler(w, r, name, icon)
+		return createPlayerHandler(cfg, w, r, name, icon)
 	} else {
-		return chooseNameAndIconHandler(w, r)
+		return chooseNameAndIconHandler(cfg, w, r)
 	}
 }
 
-func createPlayerHandler(w http.ResponseWriter, r *http.Request, name string, iconStr string) error {
+func createPlayerHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request, name string, iconStr string) error {
 	icon, err := strconv.Atoi(iconStr)
 	if err != nil {
 		return fmt.Errorf("failed to parse icon: %w", err)
 	}
 
-	id, err := database.CreatePlayer(name, config.InitialRating, icon, config.Season)
+	id, err := database.CreatePlayer(name, cfg.InitialRating, icon, cfg.GetSeason())
 	if err != nil {
 		return fmt.Errorf("failed to create user %v: %w", name, err)
 	}
@@ -41,7 +41,7 @@ func createPlayerHandler(w http.ResponseWriter, r *http.Request, name string, ic
 	return nil
 }
 
-func chooseNameAndIconHandler(w http.ResponseWriter, r *http.Request) error {
+func chooseNameAndIconHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
 	icons := make([]int, 49)
 	for i := range icons {
 		icons[i] = i + 1

@@ -8,19 +8,19 @@ import (
 	"github.com/thalkz/kart/models"
 )
 
-func GetRankedPlayersEvents(season int, minRaces int) (map[int][]models.HistoryEvent, error) {
+func GetRankedPlayersEvents(cfg *config.Config, season int) (map[int][]models.HistoryEvent, error) {
 	rows, err := db.Query(
 		`SELECT players.id AS player_id, races.id AS race_id, date, new_rating
 			FROM (SELECT * FROM races WHERE season = $1) as races
 				CROSS JOIN (SELECT * FROM players WHERE season = $1 AND races_count >= $2) as players
 				LEFT JOIN players_races ON players.id = players_races.user_id AND races.id = players_races.race_id
-				ORDER BY player_id, date`, season, minRaces)
+				ORDER BY player_id, date`, season, cfg.MinRacesCount)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query all history: %w", err)
 	}
 
 	events := make(map[int][]models.HistoryEvent)
-	lastValidRating := config.InitialRating
+	lastValidRating := cfg.InitialRating
 	var previousPlayerId int
 	for rows.Next() {
 		var raceId int
@@ -35,7 +35,7 @@ func GetRankedPlayersEvents(season int, minRaces int) (map[int][]models.HistoryE
 		if newRating.Valid {
 			lastValidRating = newRating.Float64
 		} else if previousPlayerId != playerId {
-			lastValidRating = config.InitialRating
+			lastValidRating = cfg.InitialRating
 		}
 
 		events[playerId] = append(events[playerId], models.HistoryEvent{
@@ -53,7 +53,7 @@ func GetRankedPlayersEvents(season int, minRaces int) (map[int][]models.HistoryE
 	return events, nil
 }
 
-func GetPlayerHistory(userId int) ([]models.HistoryEvent, error) {
+func GetPlayerHistory(cfg *config.Config, userId int) ([]models.HistoryEvent, error) {
 	rows, err := db.Query(
 		`SELECT races.id, date, new_rating 
 			FROM races LEFT JOIN players_races 
@@ -64,7 +64,7 @@ func GetPlayerHistory(userId int) ([]models.HistoryEvent, error) {
 	}
 
 	history := make([]models.HistoryEvent, 0)
-	lastValidRating := config.InitialRating
+	lastValidRating := cfg.InitialRating
 	for rows.Next() {
 		var raceId int
 		var date string
