@@ -8,4 +8,5 @@
 - [x] feat: Create a page for each player with races and stats
 - [x] fix: Results page does should redirect to ranking
 - [ ] feat: Add automatic leagues with deadlines & ranking history
-- [ ] feat: Handle race equality
+- [x] feat: Handle race e
+- [x] feat: Create a Hall of Fame
