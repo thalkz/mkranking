@@ -35,6 +35,11 @@ func (c *Config) GetNextSeasonStartDate() time.Time {
 	return c.GetNextSeasonStartDateAt(time.Now())
 }
 
+func (c *Config) GetStartDate(season int) time.Time {
+	seasonDuration := time.Hour * time.Duration(24) * time.Duration(c.CompetitionDays+c.RestDays)
+	return c.FirstSeasonDate.Add(seasonDuration * time.Duration(season-1))
+}
+
 func (c *Config) GetSeasonAt(date time.Time) int {
 	return c.SeasonOffset + c.GetSecondsSinceFirstAt(date)/c.GetSeasonDurationSeconds()
 }

@@ -54,6 +54,7 @@ func main() {
 	http.HandleFunc("/welcome", makeHandler(web.WelcomePlayerPage))
 	http.HandleFunc("/races", makeHandler(web.RacesHandler))
 	http.HandleFunc("/stats", makeHandler(web.StatsHandler))
+	http.HandleFunc("/champions", makeHandler(web.ChampionsHandler))
 	http.HandleFunc("/", makeHandler(web.RankingHandler))
 
 	// Serve static files

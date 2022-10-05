@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+{{template "head.html"}}
+
+<body>
+  {{template "nav.html"}}
+
+  <main class="container">
+    {{range .Champions}}
+      <article>
+        <kbd>Season {{.Season}}</kbd>
+        <p>{{.Date}}</p>
+        <h4><img src="static/characters/{{.Icon}}.png" width="50" /> {{.Name}}</h4>
+      </article>
+    {{end}}
+  </main>
+
+  {{template "footer.html"}}
+</body>
+
+</html>
