@@ -43,27 +43,82 @@ func Open(cfg *config.Config) (func() error, error) {
 	var err error
 	db, err = sql.Open("postgres", psqlconn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect %w", err)
+		return nil, fmt.Errorf("failed to connect: %w", err)
 	}
 
 	// Check database connection
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("failed to ping %w", err)
+		return nil, fmt.Errorf("failed to ping: %w", err)
 	}
 
 	// Create tables if missing
 	if err = createPlayersTable(); err != nil {
-		return nil, fmt.Errorf("failed to create players table %w", err)
+		return nil, fmt.Errorf("failed to create players table: %w", err)
 	}
 	if err = createRacesTable(); err != nil {
-		return nil, fmt.Errorf("failed to create races table %w", err)
+		return nil, fmt.Errorf("failed to create races table: %w", err)
 	}
 	if err = createPlayersRacesTable(cfg); err != nil {
-		return nil, fmt.Errorf("failed to create players_races table %w", err)
+		return nil, fmt.Errorf("failed to create players_races table: %w", err)
+	}
+
+	if err = applyMigrations(); err != nil {
+		return nil, fmt.Errorf("failed to apply migration: %w", err)
 	}
 
 	return db.Close, nil
+}
+
+// If a migration file with the name of the current version is found, then the migration is applied
+// Migrations should update the version in the metadata table to a unique unused name, to prevent cyclic migrations
+func applyMigrations() error {
+	usedVersions := make(map[string]bool)
+	for {
+		version, err := getCurrentVersion()
+		if err != nil {
+			return fmt.Errorf("failed to get current version: %w", err)
+		}
+
+		// check cyclic migration
+		if usedVersions[version] {
+			return fmt.Errorf("cyclic migration detected: database version %v already used", version)
+		}
+		usedVersions[version] = true
+
+		// get .sql migration
+		filepath := fmt.Sprintf("../migrations/%s.sql", version)
+		migrationStr, err := os.ReadFile(filepath)
+		if os.IsNotExist(err) {
+			// No migration available for this version
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("failed to read migration file %v: %w", filepath, err)
+		}
+
+		// apply migration
+		_, err = db.Exec(string(migrationStr))
+		if err != nil {
+			return fmt.Errorf("failed to apply migration: %w", err)
+		}
+
+		log.Printf("Applied migration from file %v\n", filepath)
+	}
+}
+
+func getCurrentVersion() (string, error) {
+	row := db.QueryRow(`SELECT value FROM metadata WHERE key = 'version'`)
+	var version string
+	err := row.Scan(&version)
+	if err != nil {
+		return "", fmt.Errorf("failed to select version metadata: %w", err)
+	}
+	err = row.Err()
+	if err != nil {
+		return "", fmt.Errorf("failed to select version metadata: %w", err)
+	}
+	return version, nil
 }
 
 func createPlayersTable() error {
