@@ -22,7 +22,7 @@ var cfg = &config.Config{
 	InitialRating:   1000.0,
 	Elo: config.ConfigElo{
 		K: 32.0,
-		D: 400.0,
+		D: 200.0,
 	},
 }
 
