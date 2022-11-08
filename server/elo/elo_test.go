@@ -14,6 +14,32 @@ var eloTestConfig = &config.Config{
 	},
 }
 
+func TestEloRatings(T *testing.T) {
+	var cfg = &config.Config{
+		Elo: config.ConfigElo{
+			D: 100.0,
+			K: 32.0,
+		},
+	}
+
+	in := []float64{
+		1100.0,
+		1000.0,
+		1000.0,
+		1000.0,
+	}
+	ties := []bool{
+		false,
+		false,
+		false,
+		false,
+	}
+	out, _ := ComputeRatings(cfg, in, ties)
+	for i := range in {
+		T.Logf("Player #%v: %v", i+1, out[i]-in[i])
+	}
+}
+
 func TestComputeRatings(T *testing.T) {
 	oldRatings := []float64{
 		1000.0,
