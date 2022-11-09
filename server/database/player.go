@@ -14,6 +14,39 @@ func CreatePlayer(name string, rating float64, icon int, season int) (int, error
 	return id, err
 }
 
+func TransferPlayer(playerId int, season int) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer tx.Rollback()
+
+	var name string
+	var rating float64
+	var icon int
+	row := tx.QueryRow("SELECT name, rating, icon FROM players WHERE id = $1", playerId)
+	err = row.Scan(&name, &rating, &icon)
+	if err != nil {
+		return fmt.Errorf("failed to scan player: %w", err)
+	}
+
+	_, err = tx.Exec(`UPDATE players SET transfered = true WHERE id = $1`, playerId)
+	if err != nil {
+		return fmt.Errorf("failed to mark player as transfered: %w", err)
+	}
+
+	_, err = tx.Exec(`INSERT INTO players (name, rating, icon, season) VALUES ($1, $2, $3, $4) RETURNING id`, name, rating, icon, season)
+	if err != nil {
+		return fmt.Errorf("failed to create player: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit tx: %w", err)
+	}
+	return nil
+}
+
 func DeletePlayer(id int) error {
 	_, err := db.Exec("DELETE FROM players WHERE id = $1", id)
 	return err
@@ -88,7 +121,7 @@ func GetPlayers(playerIds []int) ([]models.Player, error) {
 }
 
 func GetAllPlayers(season int) ([]models.Player, error) {
-	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE season = $1", season)
+	rows, err := db.Query("SELECT id, name, rating, icon, races_count, RANK() OVER (ORDER BY rating DESC) rank FROM players WHERE season = $1 AND transfered = false", season)
 	players := make([]models.Player, 0)
 	for rows.Next() {
 		var player models.Player

@@ -51,6 +51,7 @@ func main() {
 	http.HandleFunc("/results", makeHandler(web.ResultsPageHandler))
 	http.HandleFunc("/submit", makeHandler(web.SubmitHandler))
 	http.HandleFunc("/new", makeHandler(web.NewPlayerHandler))
+	http.HandleFunc("/transfer", makeHandler(web.TransferPlayerHandler))
 	http.HandleFunc("/welcome", makeHandler(web.WelcomePlayerPage))
 	http.HandleFunc("/races", makeHandler(web.RacesHandler))
 	http.HandleFunc("/stats", makeHandler(web.StatsHandler))
