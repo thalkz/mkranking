@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/thalkz/kart/config"
 )
 
 var (
-	host     = os.Getenv("POSTGRES_HOST")
-	port     = os.Getenv("POSTGRES_PORT")
-	user     = os.Getenv("POSTGRES_USER")
-	password = os.Getenv("POSTGRES_PASSWORD")
-	dbname   = os.Getenv("POSTGRES_DB")
+	host            = os.Getenv("POSTGRES_HOST")
+	port            = os.Getenv("POSTGRES_PORT")
+	user            = os.Getenv("POSTGRES_USER")
+	password        = os.Getenv("POSTGRES_PASSWORD")
+	dbname          = os.Getenv("POSTGRES_DB")
+	migrationFolder = os.Getenv("MIGRATIONS_FOLDER")
 )
 
 var db *sql.DB
@@ -62,6 +64,9 @@ func Open(cfg *config.Config) (func() error, error) {
 	if err = createPlayersRacesTable(cfg); err != nil {
 		return nil, fmt.Errorf("failed to create players_races table: %w", err)
 	}
+	if err = createMetadataTable(cfg); err != nil {
+		return nil, fmt.Errorf("failed to create metadata table: %w", err)
+	}
 
 	if err = applyMigrations(); err != nil {
 		return nil, fmt.Errorf("failed to apply migration: %w", err)
@@ -87,14 +92,14 @@ func applyMigrations() error {
 		usedVersions[version] = true
 
 		// get .sql migration
-		filepath := fmt.Sprintf("../migrations/%s.sql", version)
-		migrationStr, err := os.ReadFile(filepath)
+		path := filepath.Join(migrationFolder, version+".sql")
+		migrationStr, err := os.ReadFile(path)
 		if os.IsNotExist(err) {
-			// No migration available for this version
+			log.Printf("no migration file at: %v\n", path)
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf("failed to read migration file %v: %w", filepath, err)
+			return fmt.Errorf("failed to read migration file %v: %w", path, err)
 		}
 
 		// apply migration
@@ -103,7 +108,7 @@ func applyMigrations() error {
 			return fmt.Errorf("failed to apply migration: %w", err)
 		}
 
-		log.Printf("Applied migration from file %v\n", filepath)
+		log.Printf("Applied migration from file %v\n", path)
 	}
 }
 
@@ -159,4 +164,25 @@ func createPlayersRacesTable(cfg *config.Config) error {
 	);`
 	_, err := db.Exec(fmt.Sprintf(statement, cfg.InitialRating, cfg.InitialRating))
 	return err
+}
+
+func createMetadataTable(cfg *config.Config) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS metadata (
+		key text PRIMARY KEY,
+		value text NOT NULL,
+		updated_at timestamp without time zone NOT NULL DEFAULT now()
+	);`)
+	if err != nil {
+		return fmt.Errorf("failed to create metadata table: %w", err)
+	}
+
+	version, _ := getCurrentVersion()
+	if version == "" {
+		_, err := db.Exec(`INSERT INTO metadata (key, value) values('version', 'v1')`)
+		if err != nil {
+			return fmt.Errorf("failed to initialise version to v1: %w", err)
+		}
+	}
+
+	return nil
 }

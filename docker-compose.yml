@@ -21,6 +21,8 @@ services:
       - database
     ports:
       - "$SERVER_PORT:$SERVER_PORT"
+    volumes:
+      - ./migrations:/server/migrations/
 
 volumes:
   data:
