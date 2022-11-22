@@ -28,3 +28,11 @@ jobs:
           docker tag kart_server ghcr.io/thalkz/kart_server:${{ steps.tagName.outputs.tag }}
           docker tag kart_server ghcr.io/thalkz/kart_server:latest
           docker push --all-tags ghcr.io/thalkz/kart_server
+  
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: mkranking.com
+          username: ubuntu
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
+          script: ./deploy_mkranking.sh ${{ steps.tagName.outputs.tag }}
