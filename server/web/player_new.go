@@ -42,7 +42,7 @@ func createPlayerHandler(cfg *config.Config, w http.ResponseWriter, r *http.Requ
 }
 
 func chooseNameAndIconHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) error {
-	icons := make([]int, 49)
+	icons := make([]int, 60)
 	for i := range icons {
 		icons[i] = i + 1
 	}
