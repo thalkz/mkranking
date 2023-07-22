@@ -35,4 +35,4 @@ jobs:
           host: mkranking.com
           username: ubuntu
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
-          script: ./mkranking.com/update.sh ${{ steps.tagName.outputs.tag }}
+          script: cd ./mkranking.com && ./update.sh ${{ steps.tagName.outputs.tag }}
